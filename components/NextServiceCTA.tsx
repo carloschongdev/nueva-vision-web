@@ -113,7 +113,7 @@ export default function NextServiceCTA({
       variant === "amber"
         ? "btn-amber"
         : variant === "outline-white"
-        ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/30 hover:border-white/60 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:bg-white/5"
+        ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-amber-500 hover:bg-amber-400 text-navy-900 font-sans font-bold text-sm tracking-wide transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
         : "btn-outline";
 
     return (
@@ -128,7 +128,7 @@ export default function NextServiceCTA({
 
   const baseClasses =
     variant === "amber"
-      ? "btn-amber"
+      ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-amber-500 hover:bg-amber-400 text-navy-900 font-sans font-bold text-sm tracking-wide transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
       : variant === "outline-white"
       ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/30 hover:border-white/60 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:bg-white/5"
       : "btn-outline";

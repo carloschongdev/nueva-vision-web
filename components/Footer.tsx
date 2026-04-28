@@ -9,11 +9,11 @@ export default function Footer() {
         <div className="md:col-span-2">
           <div className="flex items-center gap-4 mb-5">
             <Image
-              src="/mercy.svg"
-              alt="Logo"
-              width={64}
-              height={64}
-              className="object-contain brightness-0 invert opacity-90"
+              src="/iglesia.svg"
+              alt="Logo Iglesia Nueva Visión La Misericordia"
+              width={80}
+              height={80}
+              className="object-contain"
             />
             <div>
               <p className="font-display font-semibold text-xl leading-tight text-white">Nueva Visión</p>
