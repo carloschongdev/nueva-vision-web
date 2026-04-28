@@ -110,8 +110,8 @@ export default function NextServiceCTA({
   if (!service) {
     // SSR placeholder — sin hidration mismatch
     const base =
-      variant === "primary"
-        ? "btn-primary"
+      variant === "amber"
+        ? "btn-amber"
         : variant === "outline-white"
         ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/30 hover:border-white/60 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:bg-white/5"
         : "btn-outline";
@@ -127,8 +127,8 @@ export default function NextServiceCTA({
   const isTomorrow = service.daysUntil === 1;
 
   const baseClasses =
-    variant === "primary"
-      ? "btn-primary"
+    variant === "amber"
+      ? "btn-amber"
       : variant === "outline-white"
       ? "inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/30 hover:border-white/60 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:bg-white/5"
       : "btn-outline";
