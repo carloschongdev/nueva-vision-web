@@ -7,7 +7,7 @@ import SectionHeader from "@/components/SectionHeader";
 import NextServiceCTA from "@/components/NextServiceCTA";
 
 export const metadata: Metadata = {
-  title: "Inicio",
+  title: "Iglesia Nueva Visión La Misericordia",
   description:
     "Iglesia Nueva Visión La Misericordia en Panamá. Cultos martes, viernes y domingos. Un lugar donde puedes conocer a Dios.",
 };
