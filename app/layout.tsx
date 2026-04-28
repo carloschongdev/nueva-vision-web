@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     "Iglesia Nueva Visión La Misericordia en Panamá. Un lugar donde puedes conocer a Dios, crecer en fe y ser parte de una comunidad que transforma vidas.",
   keywords: ["iglesia", "cristiana", "panamá", "nueva visión", "misericordia"],
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/mercy.svg",
+    shortcut: "/mercy.svg",
+    apple: "/mercy.svg",
+  },
 };
 
 export default function RootLayout({
