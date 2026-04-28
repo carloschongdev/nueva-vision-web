@@ -104,10 +104,10 @@ export default function Navbar() {
         {/* ── CTA dinámico ───────────────────────────── */}
         <div className="hidden md:block">
           <NextServiceCTA
-            variant="primary"
+            variant="amber"
             showBadge={true}
             className={`text-xs py-2.5 px-5 ${
-              !dark ? "shadow-lg shadow-primary-500/30" : ""
+              !dark ? "shadow-lg shadow-amber-500/30" : ""
             }`}
           />
         </div>
@@ -159,7 +159,7 @@ export default function Navbar() {
           ))}
           <div className="pt-2 pb-1">
             <NextServiceCTA
-              variant="primary"
+              variant="amber"
               showBadge={false}
               className="w-full justify-center"
             />
