@@ -90,7 +90,7 @@ function getNextService(): ServiceInfo {
 
 interface Props {
   className?: string;
-  variant?: "primary" | "outline-white" | "outline-dark";
+  variant?: "amber" | "outline-white" | "outline-dark";
   showBadge?: boolean;
 }
 
