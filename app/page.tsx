@@ -121,7 +121,7 @@ export default function HomePage() {
             Misericordia hay un lugar guardado especialmente para ti.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <NextServiceCTA variant="primary" showBadge={true} />
+            <NextServiceCTA variant="amber" showBadge={true} />
             <Link
               href="/about"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/20 hover:border-primary-500/50 text-white hover:text-primary-300 font-sans font-semibold text-sm tracking-wide transition-all duration-300"
