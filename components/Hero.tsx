@@ -43,11 +43,11 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-4 animate-slide-up opacity-0 delay-400">
-              <NextServiceCTA
-                variant="primary"
-                showBadge={true}
-                className="shadow-lg shadow-primary-500/30"
-              />
+            <NextServiceCTA
+              variant="amber"
+              showBadge={true}
+              className="shadow-lg shadow-amber-500/30"
+            />
               <Link
                 href="/sermons"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-white/30 hover:border-white/60 text-white font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:bg-white/5"
