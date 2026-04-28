@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 
@@ -42,7 +43,13 @@ export default function ContactPage() {
               className="bg-white rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 group block shadow-sm"
               style={{ border: "1px solid rgba(26,10,36,0.07)" }}
             >
-              <div className="text-3xl mb-4">{item.icon}</div>
+              <div className="mb-4">
+                {item.label === "Dirección" ? (
+                  <Image src="/mercy.svg" width={32} height={32} alt="Ubicación" className="object-contain" />
+                ) : (
+                  <span className="text-3xl">{item.icon}</span>
+                )}
+              </div>
               <p className="text-primary-900/40 text-xs font-bold uppercase tracking-widest mb-1">{item.label}</p>
               <p className="font-sans font-semibold text-primary-900 text-sm mb-1">{item.value}</p>
               <p className="font-sans text-primary-500 text-xs font-medium">{item.sub}</p>
