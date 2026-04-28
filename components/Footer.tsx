@@ -40,8 +40,8 @@ export default function Footer() {
             ))}
           </ul>
           <div className="mt-6 pt-5 border-t border-white/5 space-y-2">
-            <a href="https://maps.app.goo.gl/JqhSGcCpx4qV5QRWA" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group w-fit" aria-label="Ver ubicación en Google Maps">
-              <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain brightness-0 invert opacity-50 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0 transition-all duration-200" />
+            <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group w-fit" aria-label="Ver ubicación en Google Maps">
+              <Image src="/mercy.svg" alt="Ubicación" width={30} height={30} className="object-contain brightness-0 invert opacity-50 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0 transition-all duration-200" />
               <span className="text-white/40 text-xs font-sans group-hover:text-amber-400 transition-colors duration-200">Arraiján, Panamá</span>
             </a>
             <a href="tel:+50760000000" className="text-white/40 text-xs font-sans hover:text-amber-400 transition-colors block">📞 +507 6000-0000</a>
