@@ -5,18 +5,18 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="bg-navy-950 text-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 grid grid-cols-1 md:grid-cols-5 gap-10">
         <div className="md:col-span-2">
           <div className="flex items-center gap-4 mb-5">
             <Image src="/iglesia.svg" alt="Logo" width={80} height={80} className="object-contain" />
             <div>
-              <p className="font-display font-semibold text-xl leading-tight text-white">Nueva Visión</p>
+              <p className="font-display font-semibold text-xl leading-tight text-white">Nueva Vision</p>
               <p className="text-amber-400 text-xs font-sans uppercase tracking-widest mt-0.5">La Misericordia</p>
             </div>
           </div>
-          <p className="font-sans text-white/50 text-sm leading-relaxed max-w-xs">Una comunidad cristiana en Panamá donde cada persona es bienvenida para conocer a Dios y crecer en fe auténtica.</p>
+          <p className="font-sans text-white/50 text-sm leading-relaxed max-w-xs">Una comunidad cristiana en Panama donde cada persona es bienvenida para conocer a Dios.</p>
           <div className="flex gap-3 mt-6">
-            {[{ label: "Facebook", short: "fb" }, { label: "Instagram", short: "ig" }, { label: "YouTube", short: "yt" }].map((s) => (
+            {[{label:"Facebook",short:"fb"},{label:"Instagram",short:"ig"},{label:"YouTube",short:"yt"}].map((s) => (
               <a key={s.label} href="#" aria-label={s.label} className="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:border-amber-500/50 hover:text-amber-400 transition-all duration-200 text-xs font-bold">{s.short}</a>
             ))}
           </div>
@@ -24,32 +24,36 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-sans font-semibold text-xs uppercase tracking-widest mb-5">Secciones</h4>
           <ul className="space-y-2.5">
-            {[{ label: "Inicio", href: "/" }, { label: "Nosotros", href: "/about" }, { label: "Predicaciones", href: "/sermons" }, { label: "Contacto", href: "/contact" }].map((l) => (
+            {[{label:"Inicio",href:"/"},{label:"Nosotros",href:"/about"},{label:"Predicaciones",href:"/sermons"},{label:"Contacto",href:"/contact"}].map((l) => (
               <li key={l.href}><Link href={l.href} className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200">{l.label}</Link></li>
             ))}
           </ul>
         </div>
         <div>
+          <h4 className="text-white font-sans font-semibold text-xs uppercase tracking-widest mb-5">Recursos</h4>
+          <ul className="space-y-2.5">
+            <li><a href="https://www.bible.com/bible/149/" target="_blank" rel="noopener noreferrer" className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200 flex items-center gap-2"><span>Leer la Biblia</span></a></li>
+            <li><Link href="/sermons" className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200">Predicaciones</Link></li>
+          </ul>
+        </div>
+        <div>
           <h4 className="text-white font-sans font-semibold text-xs uppercase tracking-widest mb-5">Horarios</h4>
           <ul className="space-y-3 text-sm">
-            {[{ day: "Martes", time: "7:00 – 9:00 PM" }, { day: "Viernes", time: "7:00 – 9:00 PM" }, { day: "Domingo", time: "10:00 AM – 1:00 PM" }].map((h) => (
-              <li key={h.day} className="flex justify-between gap-3">
-                <span className="text-white/50">{h.day}</span>
-                <span className="text-amber-400 font-medium font-sans">{h.time}</span>
-              </li>
+            {[{day:"Martes",time:"7:00 - 9:00 PM"},{day:"Viernes",time:"7:00 - 9:00 PM"},{day:"Domingo",time:"10:00 AM - 1:00 PM"}].map((h) => (
+              <li key={h.day} className="flex justify-between gap-3"><span className="text-white/50">{h.day}</span><span className="text-amber-400 font-medium font-sans">{h.time}</span></li>
             ))}
           </ul>
           <div className="mt-6 pt-5 border-t border-white/5 space-y-2">
-            <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group w-fit" aria-label="Ver ubicación en Google Maps">
-              <Image src="/mercy.svg" alt="Ubicación" width={30} height={30} className="object-contain brightness-0 invert opacity-50 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0 transition-all duration-200" />
-              <span className="text-white/40 text-xs font-sans group-hover:text-amber-400 transition-colors duration-200">Arraiján, Panamá</span>
+            <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group w-fit">
+              <Image src="/mercy.svg" alt="Ubicacion" width={18} height={18} className="object-contain brightness-0 invert opacity-40 group-hover:opacity-100 transition-all duration-200" />
+              <span className="text-white/40 text-xs font-sans group-hover:text-amber-400 transition-colors duration-200">Arraijan, Panama</span>
             </a>
-            <a href="tel:+50760000000" className="text-white/40 text-xs font-sans hover:text-amber-400 transition-colors block">📞 +507 6000-0000</a>
+            <a href="tel:+50760000000" className="text-white/40 text-xs font-sans hover:text-amber-400 transition-colors block">+507 6000-0000</a>
           </div>
         </div>
       </div>
       <div className="border-t border-white/5 py-5 px-6 text-center">
-        <p className="font-sans text-white/25 text-xs">© {year} Iglesia Nueva Visión La Misericordia — Arraiján, Panamá.</p>
+        <p className="font-sans text-white/25 text-xs">{`c ${year} Iglesia Nueva Vision La Misericordia - Arraijan, Panama.`}</p>
       </div>
     </footer>
   );
