@@ -13,7 +13,7 @@ const links = [
   { label: "Contacto",      href: "/contact" },
 ];
 
-const bibleUrl = "https://www.bible.com/bible/149/";
+const bibleUrl = "https://www.bible.com/bible";
 
 const BookIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
