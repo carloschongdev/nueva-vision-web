@@ -47,13 +47,13 @@ export default function Navbar() {
             className={`relative flex items-center justify-center transition-all duration-300 rounded-xl overflow-hidden ${
               dark ? "bg-transparent" : "bg-white/10 backdrop-blur-sm"
             }`}
-            style={{ width: 60, height: 60 }}
+            style={{ width: 100, height: 100 }}
           >
             <Image
-              src="/mercy.svg"
+              src="/iglesia.svg"
               alt="Logo"
-              width={56}
-              height={56}
+              width={90}
+              height={90}
               className={`object-contain transition-all duration-300 ${
                 dark ? "opacity-100" : "brightness-0 invert opacity-90"
               }`}
