@@ -5,6 +5,7 @@ import ServiceTimes from "@/components/ServiceTimes";
 import VisitSection from "@/components/VisitSection";
 import SectionHeader from "@/components/SectionHeader";
 import NextServiceCTA from "@/components/NextServiceCTA";
+import PanamaMap from "@/components/PanamaMap";
 
 export const metadata: Metadata = {
   title: "Iglesia Nueva Visión La Misericordia",
@@ -45,6 +46,28 @@ export default function HomePage() {
       </section>
 
       <ServiceTimes />
+
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="eyebrow">Nuestras iglesias</p>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-navy-900">
+              Encuéntranos en <span className="italic text-primary-500">Panamá</span>
+            </h2>
+            <div className="divider-amber mx-auto" />
+            <p className="font-sans text-navy-900/55 text-base max-w-md mx-auto">
+              Toca el marcador <strong className="text-primary-500">M</strong> para abrir la ubicación en Google Maps.
+            </p>
+          </div>
+          <div className="rounded-2xl overflow-hidden p-6 bg-stone-50" style={{ border: "1px solid rgba(8,15,46,0.07)" }}>
+            <PanamaMap />
+          </div>
+          <p className="text-center text-navy-900/40 text-xs font-sans mt-4">
+            Arraiján · Darién · Garachiné — Próximamente más ubicaciones
+          </p>
+        </div>
+      </section>
+
       <VisitSection />
 
       {/* Values */}
