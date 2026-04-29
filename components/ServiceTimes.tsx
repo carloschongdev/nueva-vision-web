@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const services = [
   {
@@ -61,9 +62,10 @@ export default function ServiceTimes() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-7 py-5 bg-white rounded-2xl border shadow-sm"
           style={{ borderColor: "rgba(26,10,36,0.08)" }}>
-          <p className="font-sans text-sm text-primary-900/60">
-            📍 <span className="text-primary-900 font-medium">Arraiján, República de Panamá</span>
-          </p>
+          <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+            <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
+            <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Arraiján, República de Panamá</span>
+          </a>
           <Link href="/contact" className="btn-primary text-xs py-2.5">Ver mapa →</Link>
         </div>
       </div>
