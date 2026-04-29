@@ -4,28 +4,26 @@ import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 
 export const metadata: Metadata = {
-  title: "Predicaciones",
-  description: "Mira las últimas predicaciones de Iglesia Nueva Visión La Misericordia en Panamá.",
+  title: "Alabanza y Adoración",
+  description: "Videos de alabanza y adoración cristiana en español. Adora a Dios desde donde estás.",
 };
 
-// ⚠️ Reemplaza videoId con los IDs reales de YouTube
-// Obtén el ID de: youtube.com/watch?v=ESTE_ES_EL_ID
 const featured = {
-  title: "La Misericordia de Dios no tiene límites",
-  speaker: "Pastor Principal",
-  date: "20 de abril, 2025",
-  series: "Serie: La Misericordia de Dios",
-  videoId: "dQw4w9WgXcQ",
-  description: "Un mensaje poderoso sobre cómo la misericordia de Dios alcanza a todo ser humano sin excepción.",
+  title: "Grandes Cosas - Hillsong en Español",
+  speaker: "Hillsong Worship",
+  date: "2024",
+  series: "Alabanza y Adoración",
+  videoId: "pRLqRMDqEes",
+  description: "Un poderoso tiempo de adoración para acercarte a la presencia de Dios.",
 };
 
 const sermons = [
-  { title: "Cuando la oración mueve cielos",       speaker: "Pastor Principal",     date: "15 abr 2025", series: "Vida de oración",        videoId: "dQw4w9WgXcQ", duration: "48 min" },
-  { title: "Identidad: ¿quién dices que soy?",     speaker: "Pastora de Damas",     date: "11 abr 2025", series: "Quién soy en Cristo",    videoId: "dQw4w9WgXcQ", duration: "40 min" },
-  { title: "Fe que trabaja en silencio",            speaker: "Pastor Principal",     date: "6 abr 2025",  series: "Fe auténtica",           videoId: "dQw4w9WgXcQ", duration: "45 min" },
-  { title: "El Espíritu Santo: tu mejor compañero",speaker: "Director de Alabanza", date: "1 abr 2025",  series: "Conociendo al Espíritu", videoId: "dQw4w9WgXcQ", duration: "38 min" },
-  { title: "Gracia para tiempos difíciles",         speaker: "Pastor Principal",     date: "25 mar 2025", series: "La Misericordia de Dios",videoId: "dQw4w9WgXcQ", duration: "52 min" },
-  { title: "Alabanza: el arma que no esperaban",   speaker: "Pastora de Damas",     date: "20 mar 2025", series: "Vida de oración",        videoId: "dQw4w9WgXcQ", duration: "36 min" },
+  { title: "Oceans - Hillsong United en Español",  speaker: "Hillsong United",    date: "2024", series: "Adoración Contemporánea", videoId: "pRLqRMDqEes", duration: "" },
+  { title: "Way Maker - Sinach en Español",         speaker: "Varios Artistas",    date: "2024", series: "Adoración Contemporánea", videoId: "3lLDDCDnMsI", duration: "" },
+  { title: "Reckless Love en Español",              speaker: "Cory Asbury",        date: "2024", series: "Gracia y Amor",           videoId: "mLZ-saN2HkM", duration: "" },
+  { title: "Goodness of God en Español",            speaker: "Bethel Music",       date: "2024", series: "Gracia y Amor",           videoId: "CEzFJ1PCrvo", duration: "" },
+  { title: "Tu Fidelidad - Elevation Worship",      speaker: "Elevation Worship",  date: "2024", series: "Fe y Confianza",          videoId: "XFsJTMEyYLI", duration: "" },
+  { title: "Worthy of It All en Español",           speaker: "David Brymer",       date: "2024", series: "Adoración Profunda",      videoId: "k3QCfBBsiyE", duration: "" },
 ];
 
 export default function SermonsPage() {
@@ -34,10 +32,10 @@ export default function SermonsPage() {
       <section className="relative pt-40 pb-20 px-6 bg-primary-900 overflow-hidden">
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-primary-500 to-transparent opacity-50" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <p className="text-primary-300 text-xs font-bold uppercase tracking-[0.35em] mb-5">Mensajes que transforman</p>
-          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Predicaciones</h1>
+          <p className="text-primary-300 text-xs font-bold uppercase tracking-[0.35em] mb-5">Alabanza y adoración</p>
+          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Alabanza</h1>
           <div className="w-12 h-1 rounded-full bg-primary-500 mb-5" />
-          <p className="font-sans text-white/55 text-lg max-w-2xl leading-relaxed">Escucha los mensajes de Dios que semana a semana comparte nuestra iglesia.</p>
+          <p className="font-sans text-white/55 text-lg max-w-2xl leading-relaxed">Adora a Dios desde donde estás. Videos de alabanza y adoración para acompañar tu tiempo con Él.</p>
         </div>
       </section>
 
@@ -72,7 +70,7 @@ export default function SermonsPage() {
 
       <section className="py-16 px-6 bg-stone-50 stripe-bg">
         <div className="max-w-7xl mx-auto">
-          <SectionHeader eyebrow="Archivo" title="Predicaciones" italicPart="recientes" subtitle="Revive los mensajes que han impactado a nuestra congregación." />
+          <SectionHeader eyebrow="Videos" title="Alabanza" italicPart="de alabanza" subtitle="Revive los mensajes que han impactado a nuestra congregación." />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {sermons.map((s) => (
               <div key={s.title} className="bg-white rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 group shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.07)" }}>
@@ -83,7 +81,7 @@ export default function SermonsPage() {
                       <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                     </div>
                   </div>
-                  <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-primary-950/80 text-white text-xs">{s.duration}</span>
+                  {s.duration && <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-primary-950/80 text-white text-xs">{s.duration}</span>}
                 </div>
                 <div className="p-6">
                   <p className="text-primary-500 text-xs font-bold uppercase tracking-wider mb-2">{s.series}</p>
@@ -111,7 +109,7 @@ export default function SermonsPage() {
         </h2>
         <div className="w-12 h-1 rounded-full bg-primary-500 mx-auto mb-5" />
         <p className="font-sans text-primary-900/55 text-base mb-8 max-w-md mx-auto">Nada reemplaza estar presente en comunidad.</p>
-        <Link href="/contact" className="btn-primary">Planifica tu visita</Link>
+        <Link href="/contact" className="btn-primary">Ven a adorar en persona</Link>
       </section>
     </>
   );
