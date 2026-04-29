@@ -4,26 +4,26 @@ import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 
 export const metadata: Metadata = {
-  title: "Alabanza y Adoración",
-  description: "Videos de alabanza y adoración cristiana en español. Adora a Dios desde donde estás.",
+  title: "Mensajes y Alabanza",
+  description: "Predicaciones y alabanza cristiana en español para edificar tu fe y acercarte a Dios.",
 };
 
 const featured = {
-  title: "Grandes Cosas - Hillsong en Español",
-  speaker: "Hillsong Worship",
+  title: "Tú Lo Vas a Alcanzar",
+  speaker: "Pastor Juan Carlos Harrigan",
   date: "2024",
-  series: "Alabanza y Adoración",
-  videoId: "pRLqRMDqEes",
-  description: "Un poderoso tiempo de adoración para acercarte a la presencia de Dios.",
+  series: "Predicaciones",
+  videoId: "SzwtR7eKTKA",
+  description: "Un mensaje poderoso del Pastor Juan Carlos Harrigan para fortalecer tu fe y creer en las promesas de Dios.",
 };
 
 const sermons = [
-  { title: "Oceans - Hillsong United en Español",  speaker: "Hillsong United",    date: "2024", series: "Adoración Contemporánea", videoId: "pRLqRMDqEes", duration: "" },
-  { title: "Way Maker - Sinach en Español",         speaker: "Varios Artistas",    date: "2024", series: "Adoración Contemporánea", videoId: "3lLDDCDnMsI", duration: "" },
-  { title: "Reckless Love en Español",              speaker: "Cory Asbury",        date: "2024", series: "Gracia y Amor",           videoId: "mLZ-saN2HkM", duration: "" },
-  { title: "Goodness of God en Español",            speaker: "Bethel Music",       date: "2024", series: "Gracia y Amor",           videoId: "CEzFJ1PCrvo", duration: "" },
-  { title: "Tu Fidelidad - Elevation Worship",      speaker: "Elevation Worship",  date: "2024", series: "Fe y Confianza",          videoId: "XFsJTMEyYLI", duration: "" },
-  { title: "Worthy of It All en Español",           speaker: "David Brymer",       date: "2024", series: "Adoración Profunda",      videoId: "k3QCfBBsiyE", duration: "" },
+  { title: "No Sigas Escogiendo Mal",          speaker: "Juan Pablo Lerman",              date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
+  { title: "Ordena Tu Casa",                   speaker: "Pastor Ernesto Cuevas",          date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
+  { title: "Yahweh Se Manifestará",            speaker: "Oasis Ministry",                 date: "2021", series: "Alabanza",       videoId: "Qem0WSJXLCE", duration: "" },
+  { title: "Háblame De Cerca",                 speaker: "Grupo Grace & Kairo Worship",    date: "2026", series: "Alabanza",       videoId: "0pwd1dFwWDI", duration: "" },
+  { title: "Dios Te Levantará",                speaker: "Juan Pablo Lerman",              date: "2025", series: "Predicaciones", videoId: "DbHMisO7AGg", duration: "" },
+  { title: "Barro",                            speaker: "Kairo Worship ft. Joe L Barnes", date: "2024", series: "Alabanza",       videoId: "VGKSLzCJWoY", duration: "" },
 ];
 
 export default function SermonsPage() {
@@ -33,7 +33,7 @@ export default function SermonsPage() {
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-primary-500 to-transparent opacity-50" />
         <div className="relative z-10 max-w-4xl mx-auto">
           <p className="text-primary-300 text-xs font-bold uppercase tracking-[0.35em] mb-5">Alabanza y adoración</p>
-          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Alabanza</h1>
+          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Mensajes y Alabanza</h1>
           <div className="w-12 h-1 rounded-full bg-primary-500 mb-5" />
           <p className="font-sans text-white/55 text-lg max-w-2xl leading-relaxed">Adora a Dios desde donde estás. Videos de alabanza y adoración para acompañar tu tiempo con Él.</p>
         </div>
