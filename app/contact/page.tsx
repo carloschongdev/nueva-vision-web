@@ -36,7 +36,7 @@ export default function ContactPage() {
           {[
             { icon: "📍", label: "Dirección", value: "Arraiján, Panamá", sub: "Ver en mapa →",    href: "https://maps.app.goo.gl/JqhSGcCpx4qV5QRWA" },
             { icon: "📞", label: "Teléfono",  value: "+507 6000-0000",   sub: "Lun–Vie, 9AM–5PM",href: "tel:+50760000000" },
-            { icon: "✉️", label: "Email",     value: "info@nuevavision.pa", sub: "Respondemos en 24h",href: "mailto:info@nuevavision.pa" },
+            { icon: "✉️", label: "Email",     value: "nuevavisionpty@gmail.com", sub: "Respondemos en 24h",href: "mailto:nuevavisionpty@gmail.com" },
             { icon: "💬", label: "WhatsApp",  value: "+507 6000-0000",   sub: "Escríbenos ahora", href: "https://wa.me/50760000000" },
           ].map((item) => (
             <a key={item.label} href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer"
