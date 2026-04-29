@@ -24,7 +24,8 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-sans font-semibold text-xs uppercase tracking-widest mb-5">Secciones</h4>
           <ul className="space-y-2.5">
-            {[{label:"Inicio",href:"/"},{label:"Nosotros",href:"/about"},{label:"Predicaciones",href:"/sermons"},{label:"Contacto",href:"/contact"}].map((l) => (
+            {[{label:"Inicio",href:"/"},{label:"Nosotros",href:"/about"},/* TODO: descomentar cuando tengamos las predicaciones grabadas */// {label:"Predicaciones",href:"/sermons"},
+              {label:"Contacto",href:"/contact"}].map((l) => (
               <li key={l.href}><Link href={l.href} className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200">{l.label}</Link></li>
             ))}
           </ul>
@@ -33,7 +34,8 @@ export default function Footer() {
           <h4 className="text-white font-sans font-semibold text-xs uppercase tracking-widest mb-5">Recursos</h4>
           <ul className="space-y-2.5">
             <li><a href="https://www.bible.com/bible/149/" target="_blank" rel="noopener noreferrer" className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200 flex items-center gap-2"><span>Leer la Biblia</span></a></li>
-            <li><Link href="/sermons" className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200">Predicaciones</Link></li>
+            {/* TODO: descomentar cuando tengamos las predicaciones grabadas */}
+            {/* <li><Link href="/sermons" className="font-sans text-sm text-white/50 hover:text-amber-400 transition-colors duration-200">Predicaciones</Link></li> */}
           </ul>
         </div>
         <div>

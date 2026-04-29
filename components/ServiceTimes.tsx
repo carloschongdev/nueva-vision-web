@@ -62,10 +62,17 @@ export default function ServiceTimes() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-7 py-5 bg-white rounded-2xl border shadow-sm"
           style={{ borderColor: "rgba(26,10,36,0.08)" }}>
-          <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-            <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
-            <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Arraiján, República de Panamá</span>
-          </a>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+              <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
+              <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Arraiján, República de Panamá</span>
+            </a>
+            <span className="hidden sm:block text-navy-900/20 text-sm">•</span>
+            <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+              <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
+              <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Talita Cumi, República de Panamá</span>
+            </a>
+          </div>
           <Link href="/contact" className="btn-primary text-xs py-2.5">Ver mapa →</Link>
         </div>
       </div>

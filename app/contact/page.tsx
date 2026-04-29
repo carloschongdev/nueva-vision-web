@@ -111,15 +111,36 @@ export default function ContactPage() {
           <div className="space-y-6">
             <div>
               <p className="text-primary-500 text-xs font-bold uppercase tracking-[0.35em] mb-4">Cómo llegar</p>
-              <div className="rounded-2xl overflow-hidden h-64 shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.08)" }}>
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d490.4!2d-79.7279901636073!3d8.992472214531723!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8faca1adb6eb2c9f%3A0xa2f6a7f194a8b1ce!2sNueva+Vision+La+Misericordia+Arraijan!5e0!3m2!1ses!2spa!4v1714000000000!5m2!1ses!2spa"
-                  width="100%" height="100%" style={{ border: 0 }}
-                  allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-                  title="Ubicación Iglesia Nueva Visión"
-                />
+              <div className="space-y-4">
+                <div>
+                  <div className="rounded-2xl overflow-hidden h-48 shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.08)" }}>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d490.4!2d-79.7279901636073!3d8.992472214531723!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8faca1adb6eb2c9f%3A0xa2f6a7f194a8b1ce!2sNueva+Vision+La+Misericordia+Arraijan!5e0!3m2!1ses!2spa!4v1714000000000!5m2!1ses!2spa"
+                      width="100%" height="100%" style={{ border: 0 }}
+                      allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+                      title="Ubicación Iglesia Nueva Visión - Arraiján"
+                    />
+                  </div>
+                  <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer"
+                    className="text-primary-900/40 text-xs mt-2 text-center block hover:text-primary-500 transition-colors duration-200">
+                    📍 Iglesia Nueva Visión La Misericordia · Arraiján ↗
+                  </a>
+                </div>
+                <div>
+                  <div className="rounded-2xl overflow-hidden h-48 shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.08)" }}>
+                    <iframe
+                      src="https://maps.google.com/maps?q=9.188834975184063,-79.6206907357167&z=15&output=embed"
+                      width="100%" height="100%" style={{ border: 0 }}
+                      allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+                      title="Ubicación Talita Cumi"
+                    />
+                  </div>
+                  <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer"
+                    className="text-primary-900/40 text-xs mt-2 text-center block hover:text-primary-500 transition-colors duration-200">
+                    📍 Talita Cumi · República de Panamá ↗
+                  </a>
+                </div>
               </div>
-              <p className="text-primary-900/40 text-xs mt-2 text-center">📍 Arraiján, República de Panamá</p>
             </div>
 
             <div className="rounded-2xl p-7 bg-primary-900">
