@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import Image from "next/image";
 
@@ -23,18 +23,15 @@ function toMercator(lat: number, lng: number) {
   };
 }
 
-// Forward: lat/lng → SVG pixel (1000×421 space)
 function buildForwardProjection() {
   const refs = PROJ_REFS.map((r) => ({ ...r, m: toMercator(r.lat, r.lng) }));
   const [r1, r2, r3] = refs;
   const Dmx13 = r1.m.x - r3.m.x, Dmy13 = r1.m.y - r3.m.y;
   const Dmx23 = r2.m.x - r3.m.x, Dmy23 = r2.m.y - r3.m.y;
   const det = Dmx13 * Dmy23 - Dmx23 * Dmy13;
-  // px coefficients
   const a11 = ((r1.px - r3.px) * Dmy23 - (r2.px - r3.px) * Dmy13) / det;
   const a12 = (Dmx13 * (r2.px - r3.px) - Dmx23 * (r1.px - r3.px)) / det;
   const bx  = r3.px - a11 * r3.m.x - a12 * r3.m.y;
-  // py coefficients
   const a21 = ((r1.py - r3.py) * Dmy23 - (r2.py - r3.py) * Dmy13) / det;
   const a22 = (Dmx13 * (r2.py - r3.py) - Dmx23 * (r1.py - r3.py)) / det;
   const by  = r3.py - a21 * r3.m.x - a22 * r3.m.y;
@@ -44,7 +41,6 @@ function buildForwardProjection() {
   };
 }
 
-// Inverse: SVG pixel → lat/lng  (matches simplemaps countrymap.js `e()`)
 function buildInverseProjection() {
   const refs = PROJ_REFS.map((r) => ({ ...r, m: toMercator(r.lat, r.lng) }));
   const [r1, r2, r3] = refs;
@@ -59,15 +55,14 @@ function buildInverseProjection() {
     const mx = A1 * (svgX - r3.px) + B1 * (svgY - r3.py) + r3.m.x;
     const my = A2 * (svgX - r3.px) + B2 * (svgY - r3.py) + r3.m.y;
     return [
-      Math.atan(Math.sinh(my / R)) * (180 / Math.PI), // lat
-      mx / R * (180 / Math.PI),                        // lng
+      Math.atan(Math.sinh(my / R)) * (180 / Math.PI),
+      mx / R * (180 / Math.PI),
     ];
   };
 }
 
-const projectLatLng  = buildForwardProjection();
-const pixelToLatLng  = buildInverseProjection();
-
+const projectLatLng = buildForwardProjection();
+const pixelToLatLng = buildInverseProjection();
 const SVG_W = 1000, SVG_H = 421;
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -76,7 +71,6 @@ type Location = {
   coords: [number, number]; mapsUrl: string; active: boolean;
 };
 type EditForm = { name: string; active: boolean; lat: string; lng: string; mapsUrl: string };
-type DragPos  = { id: string; x: number; y: number; lat: number; lng: number };
 
 const initialLocations: Location[] = [
   {
@@ -122,14 +116,8 @@ export default function PanamaMap() {
   const [locations, setLocations] = useState<Location[]>(initialLocations);
   const [tooltip,   setTooltip]   = useState<{ id: string; x: number; y: number } | null>(null);
 
-  // Drag
-  const draggingRef  = useRef<{ id: string } | null>(null);
-  const dragMovedRef = useRef(false);
-  const dragPosRef   = useRef<DragPos | null>(null);
-  const [dragPos, setDragPos] = useState<DragPos | null>(null);
-
-  // Add pin
-  const [pendingPin,  setPendingPin]  = useState<{ x: number; y: number; lat: number; lng: number } | null>(null);
+  // pendingPin stores SVG viewBox coordinates (not container pixels)
+  const [pendingPin,  setPendingPin]  = useState<{ svgX: number; svgY: number; lat: number; lng: number } | null>(null);
   const [newPinForm,  setNewPinForm]  = useState({ name: "", active: true });
 
   // Edit pin
@@ -149,7 +137,33 @@ export default function PanamaMap() {
     fetch("/panama.json").then((r) => r.json()).then(setGeojson);
   }, []);
 
-  // Draw provinces with the simplemaps projection via d3.geoTransform
+  // SVG viewBox coords → container-relative pixel (accounts for letterboxing via getScreenCTM)
+  const getScreenPos = useCallback((svgX: number, svgY: number): { x: number; y: number } => {
+    const svg = svgRef.current;
+    if (!svg || !containerRef.current) return { x: 0, y: 0 };
+    const pt = svg.createSVGPoint();
+    pt.x = svgX; pt.y = svgY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const screen = pt.matrixTransform(ctm);
+    const rect = containerRef.current.getBoundingClientRect();
+    return { x: screen.x - rect.left, y: screen.y - rect.top };
+  }, []);
+
+  // Client/screen coords → SVG viewBox coords
+  const screenToSvg = useCallback((clientX: number, clientY: number): { x: number; y: number } => {
+    const svg = svgRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    const pt = svg.createSVGPoint();
+    pt.x = clientX; pt.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    return { x: svgPt.x, y: svgPt.y };
+  }, []);
+
+  // Main D3 effect: draws provinces + pins as native SVG elements.
+  // Pins live inside the SVG viewBox so they scale correctly on any screen size.
   useEffect(() => {
     if (!geojson || !svgRef.current) return;
 
@@ -163,7 +177,9 @@ export default function PanamaMap() {
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
+    setTooltip(null);
 
+    // ── Provinces ──
     svg.selectAll("path")
       .data(geojson.features)
       .enter().append("path")
@@ -190,90 +206,142 @@ export default function PanamaMap() {
       .attr("opacity", "0.7")
       .attr("pointer-events", "none")
       .text((d: any) => d.properties.name ?? "");
-  }, [geojson, locations]);
 
-  // Global mouseup finalizes drag
-  useEffect(() => {
-    const onMouseUp = () => {
-      if (!draggingRef.current) return;
-      const pos = dragPosRef.current;
-      if (pos) {
-        const { id, lat, lng } = pos;
-        setLocations((prev) =>
-          prev.map((l) =>
-            l.id === id
-              ? { ...l, coords: [lng, lat], mapsUrl: `https://www.google.com/maps?q=${lat},${lng}` }
-              : l
-          )
-        );
+    // ── Pending-pin marker (edit mode "+" dot) ──
+    if (pendingPin) {
+      svg.append("circle")
+        .attr("cx", pendingPin.svgX)
+        .attr("cy", pendingPin.svgY)
+        .attr("r", 10)
+        .attr("fill", "#f59e0b")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 2)
+        .attr("pointer-events", "none");
+      svg.append("text")
+        .attr("x", pendingPin.svgX)
+        .attr("y", pendingPin.svgY + 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "14")
+        .attr("fill", "white")
+        .attr("font-weight", "bold")
+        .attr("pointer-events", "none")
+        .text("+");
+    }
+
+    // ── Pins ──
+    locations.forEach((loc) => {
+      const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
+
+      // Highlight ring around selected pin (edit mode)
+      if (editMode && editingPinId === loc.id) {
+        svg.append("circle")
+          .attr("cx", svgX)
+          .attr("cy", svgY - 20)
+          .attr("r", 20)
+          .attr("fill", "none")
+          .attr("stroke", "#f59e0b")
+          .attr("stroke-width", 1.5)
+          .attr("stroke-dasharray", "4 2")
+          .attr("pointer-events", "none");
       }
-      draggingRef.current = null;
-      dragPosRef.current  = null;
-      setDragPos(null);
-    };
-    window.addEventListener("mouseup", onMouseUp);
-    return () => window.removeEventListener("mouseup", onMouseUp);
-  }, []);
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+      // Pulse ring for active locations (view mode only, via SVG SMIL animation)
+      if (loc.active && !editMode) {
+        const pulse = svg.append("circle")
+          .attr("cx", svgX)
+          .attr("cy", svgY - 5)
+          .attr("r", 8)
+          .attr("fill", "#6b278a")
+          .attr("opacity", 0.2)
+          .attr("pointer-events", "none");
+        pulse.append("animate")
+          .attr("attributeName", "r")
+          .attr("from", "8").attr("to", "20")
+          .attr("dur", "1.5s").attr("repeatCount", "indefinite");
+        pulse.append("animate")
+          .attr("attributeName", "opacity")
+          .attr("from", "0.2").attr("to", "0")
+          .attr("dur", "1.5s").attr("repeatCount", "indefinite");
+      }
 
-  // Convert SVG viewBox coords → container pixel
-  // Uses the SVG's actual rendered bounding rect to account for
-  // letterboxing from preserveAspectRatio="xMidYMid meet".
-  const svgToContainer = (svgX: number, svgY: number): [number, number] => {
-    const rect = svgRef.current?.getBoundingClientRect();
-    const rw = rect?.width  ?? SVG_W;
-    const rh = rect?.height ?? SVG_H;
-    return [svgX * rw / SVG_W, svgY * rh / SVG_H];
-  };
+      // Pin image — rendered inside SVG viewBox so it scales with the map
+      const pinEl = svg.append("image")
+        .attr("href", "/mercy.svg")
+        .attr("x", svgX - 15)
+        .attr("y", svgY - 40)
+        .attr("width", 30)
+        .attr("height", 40)
+        .attr("opacity", loc.active ? 1 : 0.35)
+        .style("filter", loc.active ? "none" : "grayscale(100%)")
+        .style("cursor", editMode ? "grab" : "pointer");
 
-  // Get container-pixel position for a pin (respecting drag / edit-form overrides)
-  const getPinPos = (loc: Location): { x: number; y: number } => {
-    if (dragPos?.id === loc.id) return { x: dragPos.x, y: dragPos.y };
-    let lat = loc.coords[1], lng = loc.coords[0];
-    if (editingPinId === loc.id) {
-      const fl = parseFloat(editPinForm.lat), fng = parseFloat(editPinForm.lng);
-      if (!isNaN(fl) && !isNaN(fng)) { lat = fl; lng = fng; }
-    }
-    const [svgX, svgY] = projectLatLng(lat, lng);
-    const [x, y] = svgToContainer(svgX, svgY);
-    return { x, y };
-  };
+      if (!editMode) {
+        // View mode: click → open Google Maps; hover → tooltip
+        pinEl
+          .on("click", (event: MouseEvent) => {
+            event.stopPropagation();
+            window.open(loc.mapsUrl, "_blank");
+          })
+          .on("mouseenter", () => {
+            const pos = getScreenPos(svgX, svgY);
+            setTooltip({ id: loc.id, x: pos.x, y: pos.y });
+          })
+          .on("mouseleave", () => setTooltip(null));
+      } else {
+        // Edit mode: D3 drag to reposition; zero-movement click → select for editing
+        let dragMoved = false;
 
-  // ── Event handlers ────────────────────────────────────────────────────────
+        const drag = d3.drag()
+          .on("start", () => { dragMoved = false; })
+          .on("drag", function(event: any) {
+            dragMoved = true;
+            const c = screenToSvg(event.sourceEvent.clientX, event.sourceEvent.clientY);
+            d3.select(this as SVGImageElement)
+              .attr("x", c.x - 15)
+              .attr("y", c.y - 40);
+            if (editingPinIdRef.current === loc.id) {
+              const [lat, lng] = pixelToLatLng(c.x, c.y);
+              setEditPinForm((f) => ({
+                ...f, lat: lat.toFixed(6), lng: lng.toFixed(6),
+                mapsUrl: `https://www.google.com/maps?q=${lat.toFixed(6)},${lng.toFixed(6)}`,
+              }));
+            }
+          })
+          .on("end", function(event: any) {
+            if (dragMoved) {
+              const c = screenToSvg(event.sourceEvent.clientX, event.sourceEvent.clientY);
+              const [lat, lng] = pixelToLatLng(c.x, c.y);
+              setLocations((prev) =>
+                prev.map((l) =>
+                  l.id === loc.id
+                    ? { ...l, coords: [lng, lat], mapsUrl: `https://www.google.com/maps?q=${lat.toFixed(6)},${lng.toFixed(6)}` }
+                    : l
+                )
+              );
+            } else {
+              event.sourceEvent?.stopPropagation();
+              setEditingPinId(loc.id);
+              setEditPinForm({
+                name: loc.name, active: loc.active,
+                lat: loc.coords[1].toFixed(6), lng: loc.coords[0].toFixed(6),
+                mapsUrl: loc.mapsUrl,
+              });
+              setPendingPin(null);
+            }
+          });
 
-  const handleContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!draggingRef.current || !containerRef.current) return;
-    dragMovedRef.current = true;
-    const rect = containerRef.current.getBoundingClientRect();
-    const cw = containerRef.current.clientWidth  || SVG_W;
-    const ch = containerRef.current.clientHeight || SVG_H;
-    const pxX = e.clientX - rect.left;
-    const pxY = e.clientY - rect.top;
-    // Container pixel → SVG viewBox → lat/lng
-    const [lat, lng] = pixelToLatLng(pxX * SVG_W / cw, pxY * SVG_H / ch);
-    const pos: DragPos = { id: draggingRef.current.id, x: pxX, y: pxY, lat, lng };
-    dragPosRef.current = pos;
-    setDragPos(pos);
-    if (editingPinIdRef.current === draggingRef.current.id) {
-      setEditPinForm((f) => ({
-        ...f,
-        lat: lat.toFixed(6), lng: lng.toFixed(6),
-        mapsUrl: `https://www.google.com/maps?q=${lat.toFixed(6)},${lng.toFixed(6)}`,
-      }));
-    }
-  };
+        pinEl.call(drag as any);
+      }
+    });
+  }, [geojson, locations, editMode, editingPinId, pendingPin, getScreenPos, screenToSvg]);
 
-  const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!editMode || !containerRef.current) return;
-    if (dragMovedRef.current) { dragMovedRef.current = false; return; }
-    const rect = containerRef.current.getBoundingClientRect();
-    const cw = containerRef.current.clientWidth  || SVG_W;
-    const ch = containerRef.current.clientHeight || SVG_H;
-    const pxX = e.clientX - rect.left;
-    const pxY = e.clientY - rect.top;
-    const [lat, lng] = pixelToLatLng(pxX * SVG_W / cw, pxY * SVG_H / ch);
-    setPendingPin({ x: pxX, y: pxY, lat, lng });
+  // SVG click: add new pin at clicked position (edit mode only, skips existing pins)
+  const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!editMode) return;
+    if ((e.target as SVGElement).tagName === "image") return;
+    const c = screenToSvg(e.clientX, e.clientY);
+    const [lat, lng] = pixelToLatLng(c.x, c.y);
+    setPendingPin({ svgX: c.x, svgY: c.y, lat, lng });
     setEditingPinId(null);
     setNewPinForm({ name: "", active: true });
   };
@@ -293,24 +361,6 @@ export default function PanamaMap() {
     ]);
     setPendingPin(null);
     setNewPinForm({ name: "", active: true });
-  };
-
-  const handlePinMouseDown = (e: React.MouseEvent, loc: Location) => {
-    e.stopPropagation(); e.preventDefault();
-    draggingRef.current = { id: loc.id };
-    dragMovedRef.current = false;
-  };
-
-  const handlePinClick = (e: React.MouseEvent, loc: Location) => {
-    e.stopPropagation();
-    if (dragMovedRef.current) { dragMovedRef.current = false; return; }
-    setEditingPinId(loc.id);
-    setEditPinForm({
-      name: loc.name, active: loc.active,
-      lat: loc.coords[1].toFixed(6), lng: loc.coords[0].toFixed(6),
-      mapsUrl: loc.mapsUrl,
-    });
-    setPendingPin(null);
   };
 
   const handleEditCoordChange = (field: "lat" | "lng", val: string) => {
@@ -344,8 +394,6 @@ export default function PanamaMap() {
     setEditingPinId(null);
   };
 
-  // ── Export ────────────────────────────────────────────────────────────────
-
   const exportCode = `const locations = ${JSON.stringify(
     locations.map(({ id, name, province, coords, mapsUrl, active }) => ({
       id, name, province, coords, mapsUrl, active,
@@ -358,20 +406,24 @@ export default function PanamaMap() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ── Derived ───────────────────────────────────────────────────────────────
-
-  const editingLoc = editingPinId ? locations.find((l) => l.id === editingPinId) : null;
+  // Popup positions — derived via getScreenPos (getScreenCTM-based, always accurate)
+  const editingLoc      = editingPinId ? locations.find((l) => l.id === editingPinId) : null;
+  const editPopupPos    = editingLoc
+    ? getScreenPos(...projectLatLng(editingLoc.coords[1], editingLoc.coords[0]))
+    : null;
+  const pendingPopupPos = pendingPin ? getScreenPos(pendingPin.svgX, pendingPin.svgY) : null;
   const cw = containerRef.current?.clientWidth ?? SVG_W;
-  const isDragging = !!dragPos;
-
-  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="relative w-full">
       {isDev && (
         <div className="flex justify-end mb-2">
           <button
-            onClick={() => { setEditMode((m) => !m); setPendingPin(null); setEditingPinId(null); setShowExport(false); setTooltip(null); }}
+            onClick={() => {
+              setEditMode((m) => !m);
+              setPendingPin(null); setEditingPinId(null);
+              setShowExport(false); setTooltip(null);
+            }}
             className={`text-xs font-sans font-semibold px-3 py-1.5 rounded-full border transition-colors ${
               editMode
                 ? "bg-amber-500 text-white border-amber-500"
@@ -386,100 +438,41 @@ export default function PanamaMap() {
       <div
         ref={containerRef}
         className="relative w-full rounded-xl overflow-hidden"
-        style={{ height: "420px", userSelect: isDragging ? "none" : undefined, cursor: isDragging ? "grabbing" : undefined }}
-        onMouseMove={handleContainerMouseMove}
+        style={{ aspectRatio: "1000/421", height: "auto" }}
       >
-        {/* SVG map — fixed viewBox aligned to simplemaps 1000×421 */}
+        {/* SVG owns the entire coordinate space — pins are native SVG elements inside */}
         <svg
           ref={svgRef}
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
           preserveAspectRatio="xMidYMid meet"
           width="100%"
           height="100%"
-          onClick={handleMapClick}
-          className={editMode && !isDragging ? "cursor-crosshair" : ""}
+          onClick={handleSvgClick}
+          className={editMode ? "cursor-crosshair" : ""}
         />
 
-        {/* Pin markers (HTML overlay, scaled from SVG viewBox to container pixels) */}
-        {locations.map((loc) => {
-          const pos = getPinPos(loc);
-          const isBeingDragged = dragPos?.id === loc.id;
-
-          // mercy.svg is already a teardrop/pin shape with the tip at the bottom.
-          // Anchor: pos.x, pos.y = bottom tip of the logo.
-          const pinBody = (
-            <div
-              style={{
-                position: "absolute",
-                left: pos.x - 16,
-                top: pos.y - 38,
-                width: 36,
-                opacity: loc.active ? 1 : 0.4,
-                filter: loc.active ? undefined : "grayscale(1)",
-                zIndex: isBeingDragged ? 50 : 10,
-                transform: isBeingDragged ? "scale(1.2)" : editingPinId === loc.id ? "scale(1.1)" : undefined,
-                transition: "transform 0.15s",
-              }}
-            >
-              {/* Pulse ring — centred on the pin tip */}
-              {loc.active && !isBeingDragged && (
-                <div
-                  className="rounded-full bg-primary-500 opacity-20 animate-ping"
-                  style={{ position: "absolute", left: 8, top: 28, width: 16, height: 16 }}
-                />
-              )}
-              <Image src="/mercy.svg" alt={loc.name} width={36} height={36} draggable={false}
-                className="drop-shadow-md select-none" />
-            </div>
-          );
-
-          return editMode ? (
-            <div
-              key={loc.id}
-              style={{ position: "absolute", left: 0, top: 0, cursor: isBeingDragged ? "grabbing" : "grab" }}
-              onMouseDown={(e) => handlePinMouseDown(e, loc)}
-              onClick={(e) => handlePinClick(e, loc)}
-            >
-              {pinBody}
-            </div>
-          ) : (
-            <a
-              key={loc.id}
-              href={loc.mapsUrl} target="_blank" rel="noopener noreferrer"
-              style={{ position: "absolute", left: 0, top: 0 }}
-              onMouseEnter={() => setTooltip({ id: loc.id, x: pos.x, y: pos.y })}
-              onMouseLeave={() => setTooltip(null)}
-            >
-              {pinBody}
-            </a>
-          );
-        })}
-
-        {/* Pending new-pin marker */}
-        {pendingPin && (
-          <div className="absolute z-30 pointer-events-none" style={{ left: pendingPin.x - 12, top: pendingPin.y - 12 }}>
-            <div className="w-6 h-6 rounded-full bg-amber-500 border-2 border-white shadow-lg flex items-center justify-center">
-              <span className="text-white text-xs font-bold leading-none">+</span>
-            </div>
-          </div>
-        )}
-
-        {/* Add-pin popup */}
-        {pendingPin && (
+        {/* Add-pin popup — HTML overlay, positioned via getScreenPos */}
+        {pendingPin && pendingPopupPos && (
           <div
             className="absolute z-40 bg-white rounded-xl shadow-xl p-4 w-52"
-            style={{ left: Math.min(pendingPin.x + 14, cw - 220), top: Math.max(pendingPin.y - 110, 8), border: "1px solid rgba(8,15,46,0.10)" }}
+            style={{
+              left: Math.min(pendingPopupPos.x + 14, cw - 220),
+              top: Math.max(pendingPopupPos.y - 110, 8),
+              border: "1px solid rgba(8,15,46,0.10)",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <p className="font-sans font-bold text-xs text-navy-900 mb-1">📍 Nuevo punto</p>
             <p className="font-mono text-[10px] text-navy-900/40 mb-2 select-all">
               {pendingPin.lat.toFixed(6)}, {pendingPin.lng.toFixed(6)}
             </p>
-            <input autoFocus type="text" placeholder="Nombre del lugar" value={newPinForm.name}
+            <input
+              autoFocus type="text" placeholder="Nombre del lugar" value={newPinForm.name}
               onChange={(e) => setNewPinForm((f) => ({ ...f, name: e.target.value }))}
               onKeyDown={(e) => e.key === "Enter" && handleAddPin()}
               className="w-full text-xs border rounded-lg px-2 py-1.5 mb-2 font-sans focus:outline-none focus:ring-1 focus:ring-primary-500"
-              style={{ borderColor: "rgba(8,15,46,0.15)" }} />
+              style={{ borderColor: "rgba(8,15,46,0.15)" }}
+            />
             <div className="flex gap-1 mb-3">
               {[true, false].map((active) => (
                 <button key={String(active)} onClick={() => setNewPinForm((f) => ({ ...f, active }))}
@@ -499,57 +492,64 @@ export default function PanamaMap() {
           </div>
         )}
 
-        {/* Edit-pin popup */}
-        {editingPinId && editingLoc && (() => {
-          const pos = getPinPos(editingLoc);
-          return (
-            <div
-              className="absolute z-40 bg-white rounded-xl shadow-xl p-4 w-56"
-              style={{ left: Math.min(pos.x + 14, cw - 240), top: Math.max(pos.y - 185, 8), border: "1px solid rgba(8,15,46,0.10)" }}
-              onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}
-            >
-              <p className="font-sans font-bold text-xs text-navy-900 mb-2">
-                {isDragging && dragPos?.id === editingPinId ? "🔄 Arrastrando..." : "✏️ Editar punto"}
-              </p>
-              <input type="text" value={editPinForm.name} placeholder="Nombre"
-                onChange={(e) => setEditPinForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full text-xs border rounded-lg px-2 py-1.5 mb-2 font-sans focus:outline-none focus:ring-1 focus:ring-primary-500"
-                style={{ borderColor: "rgba(8,15,46,0.15)" }} />
-              <div className="grid grid-cols-2 gap-1 mb-2">
-                {(["lat", "lng"] as const).map((field) => (
-                  <div key={field}>
-                    <label className="font-sans text-[10px] text-navy-900/50 mb-0.5 block capitalize">{field === "lat" ? "Latitud" : "Longitud"}</label>
-                    <input type="number" step="0.000001" value={editPinForm[field]}
-                      onChange={(e) => handleEditCoordChange(field, e.target.value)}
-                      className="w-full text-[10px] border rounded-lg px-2 py-1.5 font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
-                      style={{ borderColor: "rgba(8,15,46,0.15)" }} />
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-1 mb-2">
-                {[true, false].map((active) => (
-                  <button key={String(active)} onClick={() => setEditPinForm((f) => ({ ...f, active }))}
-                    className={`flex-1 text-[10px] font-sans font-semibold py-1 rounded-lg transition-colors ${
-                      editPinForm.active === active
-                        ? active ? "bg-primary-500 text-white" : "bg-amber-500 text-white"
-                        : "bg-stone-100 text-navy-900/50"
-                    }`}>
-                    {active ? "Activa" : "Próx."}
-                  </button>
-                ))}
-              </div>
-              <input type="text" value={editPinForm.mapsUrl} placeholder="URL Google Maps"
-                onChange={(e) => setEditPinForm((f) => ({ ...f, mapsUrl: e.target.value }))}
-                className="w-full text-[10px] border rounded-lg px-2 py-1.5 mb-3 font-mono focus:outline-none focus:ring-1 focus:ring-primary-500 truncate"
-                style={{ borderColor: "rgba(8,15,46,0.15)" }} />
-              <div className="flex gap-1">
-                <button onClick={handleSavePin} className="flex-1 bg-primary-500 text-white text-xs font-sans font-semibold py-1.5 rounded-lg hover:bg-primary-600 transition-colors">Guardar</button>
-                <button onClick={handleDeletePin} className="flex-1 bg-red-500 text-white text-xs font-sans font-semibold py-1.5 rounded-lg hover:bg-red-600 transition-colors">Eliminar</button>
-                <button onClick={() => setEditingPinId(null)} className="px-2 text-navy-900/40 hover:text-navy-900 text-xs transition-colors">✕</button>
-              </div>
+        {/* Edit-pin popup — HTML overlay, positioned via getScreenPos */}
+        {editingPinId && editingLoc && editPopupPos && (
+          <div
+            className="absolute z-40 bg-white rounded-xl shadow-xl p-4 w-56"
+            style={{
+              left: Math.min(editPopupPos.x + 14, cw - 240),
+              top: Math.max(editPopupPos.y - 185, 8),
+              border: "1px solid rgba(8,15,46,0.10)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-sans font-bold text-xs text-navy-900 mb-2">✏️ Editar punto</p>
+            <input
+              type="text" value={editPinForm.name} placeholder="Nombre"
+              onChange={(e) => setEditPinForm((f) => ({ ...f, name: e.target.value }))}
+              className="w-full text-xs border rounded-lg px-2 py-1.5 mb-2 font-sans focus:outline-none focus:ring-1 focus:ring-primary-500"
+              style={{ borderColor: "rgba(8,15,46,0.15)" }}
+            />
+            <div className="grid grid-cols-2 gap-1 mb-2">
+              {(["lat", "lng"] as const).map((field) => (
+                <div key={field}>
+                  <label className="font-sans text-[10px] text-navy-900/50 mb-0.5 block">
+                    {field === "lat" ? "Latitud" : "Longitud"}
+                  </label>
+                  <input
+                    type="number" step="0.000001" value={editPinForm[field]}
+                    onChange={(e) => handleEditCoordChange(field, e.target.value)}
+                    className="w-full text-[10px] border rounded-lg px-2 py-1.5 font-mono focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    style={{ borderColor: "rgba(8,15,46,0.15)" }}
+                  />
+                </div>
+              ))}
             </div>
-          );
-        })()}
+            <div className="flex gap-1 mb-2">
+              {[true, false].map((active) => (
+                <button key={String(active)} onClick={() => setEditPinForm((f) => ({ ...f, active }))}
+                  className={`flex-1 text-[10px] font-sans font-semibold py-1 rounded-lg transition-colors ${
+                    editPinForm.active === active
+                      ? active ? "bg-primary-500 text-white" : "bg-amber-500 text-white"
+                      : "bg-stone-100 text-navy-900/50"
+                  }`}>
+                  {active ? "Activa" : "Próx."}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text" value={editPinForm.mapsUrl} placeholder="URL Google Maps"
+              onChange={(e) => setEditPinForm((f) => ({ ...f, mapsUrl: e.target.value }))}
+              className="w-full text-[10px] border rounded-lg px-2 py-1.5 mb-3 font-mono focus:outline-none focus:ring-1 focus:ring-primary-500 truncate"
+              style={{ borderColor: "rgba(8,15,46,0.15)" }}
+            />
+            <div className="flex gap-1">
+              <button onClick={handleSavePin} className="flex-1 bg-primary-500 text-white text-xs font-sans font-semibold py-1.5 rounded-lg hover:bg-primary-600 transition-colors">Guardar</button>
+              <button onClick={handleDeletePin} className="flex-1 bg-red-500 text-white text-xs font-sans font-semibold py-1.5 rounded-lg hover:bg-red-600 transition-colors">Eliminar</button>
+              <button onClick={() => setEditingPinId(null)} className="px-2 text-navy-900/40 hover:text-navy-900 text-xs transition-colors">✕</button>
+            </div>
+          </div>
+        )}
 
         {/* View-mode tooltip */}
         {!editMode && tooltip && (
