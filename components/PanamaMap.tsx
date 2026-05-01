@@ -116,6 +116,9 @@ export default function PanamaMap() {
   const [locations, setLocations] = useState<Location[]>(initialLocations);
   const [tooltip,   setTooltip]   = useState<{ id: string; x: number; y: number } | null>(null);
 
+  // Container-relative pixel positions for each pin, recalculated on layout changes
+  const [pinPositions, setPinPositions] = useState<Record<string, { x: number; y: number }>>({});
+
   // pendingPin stores SVG viewBox coordinates (not container pixels)
   const [pendingPin,  setPendingPin]  = useState<{ svgX: number; svgY: number; lat: number; lng: number } | null>(null);
   const [newPinForm,  setNewPinForm]  = useState({ name: "", active: true });
@@ -162,8 +165,24 @@ export default function PanamaMap() {
     return { x: svgPt.x, y: svgPt.y };
   }, []);
 
-  // Main D3 effect: draws provinces + pins as native SVG elements.
-  // Pins live inside the SVG viewBox so they scale correctly on any screen size.
+  // Compute container-relative pin positions; re-runs on resize so HTML overlays track the map
+  useEffect(() => {
+    if (!geojson) return;
+    const compute = () => {
+      const positions: Record<string, { x: number; y: number }> = {};
+      locations.forEach((loc) => {
+        const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
+        positions[loc.id] = getScreenPos(svgX, svgY);
+      });
+      setPinPositions(positions);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, [geojson, locations, getScreenPos]);
+
+  // Main D3 effect: draws provinces + SVG decorations (pulse rings, edit overlays).
+  // In view mode, pin images are rendered as HTML overlays instead of SVG <image> elements.
   useEffect(() => {
     if (!geojson || !svgRef.current) return;
 
@@ -228,7 +247,7 @@ export default function PanamaMap() {
         .text("+");
     }
 
-    // ── Pins ──
+    // ── Per-pin SVG decorations ──
     locations.forEach((loc) => {
       const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
 
@@ -264,32 +283,19 @@ export default function PanamaMap() {
           .attr("dur", "1.5s").attr("repeatCount", "indefinite");
       }
 
-      // Pin image — rendered inside SVG viewBox so it scales with the map
-      const pinEl = svg.append("image")
-        .attr("href", "/mercy.svg")
-        .attr("x", svgX - 15)
-        .attr("y", svgY - 40)
-        .attr("width", 30)
-        .attr("height", 40)
-        .attr("opacity", loc.active ? 1 : 0.35)
-        .style("filter", loc.active ? "none" : "grayscale(100%)")
-        .style("cursor", editMode ? "grab" : "pointer")
-        .style("pointer-events", "all");
+      // Pin image — only rendered in edit mode; view mode uses HTML <a> overlay
+      if (editMode) {
+        const pinEl = svg.append("image")
+          .attr("href", "/mercy.svg")
+          .attr("x", svgX - 15)
+          .attr("y", svgY - 40)
+          .attr("width", 30)
+          .attr("height", 40)
+          .attr("opacity", loc.active ? 1 : 0.35)
+          .style("filter", loc.active ? "none" : "grayscale(100%)")
+          .style("cursor", "grab")
+          .style("pointer-events", "all");
 
-      if (!editMode) {
-        // View mode: click → open Google Maps; hover → tooltip
-        pinEl
-          .on("click", (event: MouseEvent) => {
-            event.stopPropagation();
-            setTimeout(() => window.open(loc.mapsUrl, "_blank", "noopener,noreferrer"), 0);
-          })
-          .on("mouseenter", () => {
-            const pos = getScreenPos(svgX, svgY);
-            setTooltip({ id: loc.id, x: pos.x, y: pos.y });
-          })
-          .on("mouseleave", () => setTooltip(null));
-      } else {
-        // Edit mode: D3 drag to reposition; zero-movement click → select for editing
         let dragMoved = false;
 
         const drag = d3.drag()
@@ -441,7 +447,7 @@ export default function PanamaMap() {
         className="relative w-full rounded-xl overflow-hidden"
         style={{ aspectRatio: "1000/421", height: "auto" }}
       >
-        {/* SVG owns the entire coordinate space — pins are native SVG elements inside */}
+        {/* SVG: provinces, province labels, pulse rings, edit overlays */}
         <svg
           ref={svgRef}
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
@@ -451,6 +457,48 @@ export default function PanamaMap() {
           onClick={handleSvgClick}
           className={editMode ? "cursor-crosshair" : ""}
         />
+
+        {/* View-mode pin overlays — real HTML <a> links, positioned via getScreenCTM */}
+        {!editMode && locations.map((loc) => {
+          const pos = pinPositions[loc.id];
+          if (!pos) return null;
+          const style: React.CSSProperties = {
+            position: "absolute",
+            left: pos.x - 15,
+            top: pos.y - 40,
+            width: 30,
+            height: 40,
+            zIndex: 10,
+            display: "block",
+          };
+          if (loc.active) {
+            return (
+              <a
+                key={loc.id}
+                href={loc.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={style}
+                onMouseEnter={() => setTooltip({ id: loc.id, x: pos.x, y: pos.y })}
+                onMouseLeave={() => setTooltip(null)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
+              </a>
+            );
+          }
+          return (
+            <div
+              key={loc.id}
+              style={{ ...style, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
+              onMouseEnter={() => setTooltip({ id: loc.id, x: pos.x, y: pos.y })}
+              onMouseLeave={() => setTooltip(null)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
+            </div>
+          );
+        })}
 
         {/* Add-pin popup — HTML overlay, positioned via getScreenPos */}
         {pendingPin && pendingPopupPos && (
