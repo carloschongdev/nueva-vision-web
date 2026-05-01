@@ -9,8 +9,7 @@ import NextServiceCTA from "./NextServiceCTA";
 const links = [
   { label: "Inicio",        href: "/" },
   { label: "Nosotros",      href: "/about" },
-  // TODO: descomentar cuando tengamos las predicaciones grabadas
-  // { label: "Predicaciones", href: "/sermons" },
+  { label: "Predicaciones", href: "/sermons" },
   { label: "Contacto",      href: "/contact" },
 ];
 

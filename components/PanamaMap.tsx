@@ -273,14 +273,15 @@ export default function PanamaMap() {
         .attr("height", 40)
         .attr("opacity", loc.active ? 1 : 0.35)
         .style("filter", loc.active ? "none" : "grayscale(100%)")
-        .style("cursor", editMode ? "grab" : "pointer");
+        .style("cursor", editMode ? "grab" : "pointer")
+        .style("pointer-events", "all");
 
       if (!editMode) {
         // View mode: click → open Google Maps; hover → tooltip
         pinEl
           .on("click", (event: MouseEvent) => {
             event.stopPropagation();
-            window.open(loc.mapsUrl, "_blank");
+            setTimeout(() => window.open(loc.mapsUrl, "_blank", "noopener,noreferrer"), 0);
           })
           .on("mouseenter", () => {
             const pos = getScreenPos(svgX, svgY);
