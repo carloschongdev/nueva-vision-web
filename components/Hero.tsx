@@ -8,7 +8,7 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
       <Image
-        src="https://images.unsplash.com/photo-1510531704581-5b2870972060?w=1920&q=85"
+        src="/church-interior.jpg"
         alt="Congregación en culto"
         fill
         priority
