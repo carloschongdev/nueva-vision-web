@@ -1,6 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 
+const WazeIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path fill="#33ccff" d="M20.5 6.2C19 3.2 16.2 1.3 13 1A11 11 0 001 13c.2 3.2 2.1 6.1 5 7.6L4.9 23l3.9-1.9A11 11 0 0023 13c-.2-2.6-1.2-5-2.5-6.8z"/>
+    <circle fill="white" cx="9.2" cy="11.5" r="1.2"/>
+    <circle fill="white" cx="14.8" cy="11.5" r="1.2"/>
+    <path fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" d="M9.2 14.5c.7.8 1.6 1.2 2.8 1.2s2.1-.4 2.8-1.2"/>
+  </svg>
+);
+
 const services = [
   {
     day: "Martes", tag: "Entre semana",
@@ -63,15 +72,25 @@ export default function ServiceTimes() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-7 py-5 bg-white rounded-2xl border shadow-sm"
           style={{ borderColor: "rgba(26,10,36,0.08)" }}>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-              <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
-              <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Nueva Vision La Misericordia</span>
-            </a>
+            <div className="flex items-center gap-2">
+              <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+                <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
+                <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Nueva Vision La Misericordia</span>
+              </a>
+              <a href="https://waze.com/ul?ll=8.99268,-79.72803&navigate=yes" target="_blank" rel="noopener noreferrer" aria-label="Abrir en Waze" title="Abrir en Waze" className="shrink-0 hover:scale-110 transition-transform duration-200">
+                <WazeIcon className="w-5 h-5" />
+              </a>
+            </div>
             <span className="hidden sm:block text-navy-900/20 text-sm">•</span>
-            <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-              <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
-              <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Talita Cumi</span>
-            </a>
+            <div className="flex items-center gap-2">
+              <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+                <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
+                <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Talita Cumi</span>
+              </a>
+              <a href="https://waze.com/ul?ll=9.18883,-79.62069&navigate=yes" target="_blank" rel="noopener noreferrer" aria-label="Abrir en Waze" title="Abrir en Waze" className="shrink-0 hover:scale-110 transition-transform duration-200">
+                <WazeIcon className="w-5 h-5" />
+              </a>
+            </div>
           </div>
           <Link href="/contact" className="btn-primary text-xs py-2.5">Ver mapa →</Link>
         </div>
