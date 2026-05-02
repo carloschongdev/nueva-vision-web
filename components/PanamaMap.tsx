@@ -66,6 +66,15 @@ const pixelToLatLng = buildInverseProjection();
 const SVG_W = 1000, SVG_H = 421;
 // ─────────────────────────────────────────────────────────────────────────────
 
+const WazeIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path fill="#33ccff" d="M20.5 6.2C19 3.2 16.2 1.3 13 1A11 11 0 001 13c.2 3.2 2.1 6.1 5 7.6L4.9 23l3.9-1.9A11 11 0 0023 13c-.2-2.6-1.2-5-2.5-6.8z"/>
+    <circle fill="white" cx="9.2" cy="11.5" r="1.2"/>
+    <circle fill="white" cx="14.8" cy="11.5" r="1.2"/>
+    <path fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" d="M9.2 14.5c.7.8 1.6 1.2 2.8 1.2s2.1-.4 2.8-1.2"/>
+  </svg>
+);
+
 type Location = {
   id: string; name: string; province: string;
   coords: [number, number]; mapsUrl: string; active: boolean;
@@ -115,9 +124,24 @@ export default function PanamaMap() {
   const [editMode,  setEditMode]  = useState(false);
   const [locations, setLocations] = useState<Location[]>(initialLocations);
   const [tooltip,   setTooltip]   = useState<{ id: string; x: number; y: number } | null>(null);
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showTooltip = useCallback((id: string, x: number, y: number) => {
+    if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+    setTooltip({ id, x, y });
+  }, []);
+
+  const hideTooltip = useCallback(() => {
+    tooltipTimerRef.current = setTimeout(() => setTooltip(null), 150);
+  }, []);
+
+  const cancelHideTooltip = useCallback(() => {
+    if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+  }, []);
 
   // Container-relative pixel positions for each pin, recalculated on layout changes
   const [pinPositions, setPinPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [pinScale, setPinScale] = useState(1);
 
   // pendingPin stores SVG viewBox coordinates (not container pixels)
   const [pendingPin,  setPendingPin]  = useState<{ svgX: number; svgY: number; lat: number; lng: number } | null>(null);
@@ -169,6 +193,9 @@ export default function PanamaMap() {
   const recalcPinPositions = useCallback(() => {
     requestAnimationFrame(() => {
       if (!svgRef.current || !containerRef.current) return;
+      const containerWidth = containerRef.current.clientWidth ?? 800;
+      const scale = containerWidth / 800;
+      setPinScale(scale);
       const newPositions: Record<string, { x: number; y: number }> = {};
       locations.forEach((loc) => {
         const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
@@ -484,15 +511,18 @@ export default function PanamaMap() {
         />
 
         {/* View-mode pin overlays — real HTML <a> links, positioned via getScreenCTM */}
-        {!editMode && locations.map((loc) => {
+        {!editMode && (() => {
+          const pinW = Math.max(16, Math.round(28 * pinScale));
+          const pinH = Math.max(21, Math.round(38 * pinScale));
+          return locations.map((loc) => {
           const pos = pinPositions[loc.id];
           if (!pos) return null;
           const style: React.CSSProperties = {
             position: "absolute",
-            left: pos.x - 15,
-            top: pos.y - 40,
-            width: 30,
-            height: 40,
+            left: pos.x - pinW / 2,
+            top: pos.y - pinH,
+            width: pinW,
+            height: pinH,
             zIndex: 10,
             display: "block",
           };
@@ -504,8 +534,8 @@ export default function PanamaMap() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={style}
-                onMouseEnter={() => setTooltip({ id: loc.id, x: pos.x, y: pos.y })}
-                onMouseLeave={() => setTooltip(null)}
+                onMouseEnter={() => showTooltip(loc.id, pos.x, pos.y)}
+                onMouseLeave={hideTooltip}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
@@ -516,14 +546,15 @@ export default function PanamaMap() {
             <div
               key={loc.id}
               style={{ ...style, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
-              onMouseEnter={() => setTooltip({ id: loc.id, x: pos.x, y: pos.y })}
-              onMouseLeave={() => setTooltip(null)}
+              onMouseEnter={() => showTooltip(loc.id, pos.x, pos.y)}
+              onMouseLeave={hideTooltip}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
             </div>
           );
-        })}
+        });
+        })()}
 
         {/* Add-pin popup — HTML overlay, positioned via getScreenPos */}
         {pendingPin && pendingPopupPos && (
@@ -625,17 +656,48 @@ export default function PanamaMap() {
           </div>
         )}
 
-        {/* View-mode tooltip */}
-        {!editMode && tooltip && (
-          <div className="absolute z-20 pointer-events-none" style={{ left: tooltip.x - 55, top: tooltip.y - 70 }}>
-            <div className="bg-navy-900 text-white rounded-lg px-3 py-2 text-center shadow-lg min-w-[110px]">
-              <p className="font-sans font-bold text-xs">{locations.find((l) => l.id === tooltip.id)?.name}</p>
-              <p className="font-sans text-amber-400 text-[10px] mt-0.5">
-                {locations.find((l) => l.id === tooltip.id)?.active ? "Iglesia activa ✓" : "Próximamente"}
-              </p>
+        {/* View-mode tooltip — pointer-events enabled so Maps/Waze links are clickable */}
+        {!editMode && tooltip && (() => {
+          const loc = locations.find((l) => l.id === tooltip.id);
+          if (!loc) return null;
+          const wazeUrl = `https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`;
+          return (
+            <div
+              className="absolute z-20"
+              style={{ left: tooltip.x - 75, top: tooltip.y - 100 }}
+              onMouseEnter={cancelHideTooltip}
+              onMouseLeave={hideTooltip}
+            >
+              <div className="bg-navy-900 text-white rounded-lg px-3 py-2 text-center shadow-lg min-w-[150px]">
+                <p className="font-sans font-bold text-xs mb-0.5">{loc.name}</p>
+                <p className="font-sans text-amber-400 text-[10px]">
+                  {loc.active ? "Iglesia activa ✓" : "Próximamente"}
+                </p>
+                {loc.active && (
+                  <div className="flex gap-1.5 justify-center mt-2">
+                    <a
+                      href={loc.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[10px] font-sans font-medium bg-white/10 hover:bg-white/20 px-2 py-1 rounded-md transition-colors"
+                    >
+                      🗺 Maps
+                    </a>
+                    <a
+                      href={wazeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[10px] font-sans font-medium bg-white/10 hover:bg-white/20 px-2 py-1 rounded-md transition-colors"
+                      style={{ color: "#33ccff" }}
+                    >
+                      <WazeIcon className="w-3.5 h-3.5 inline-block" /> Waze
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Edit mode panel */}
