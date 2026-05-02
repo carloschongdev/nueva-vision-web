@@ -165,21 +165,44 @@ export default function PanamaMap() {
     return { x: svgPt.x, y: svgPt.y };
   }, []);
 
-  // Compute container-relative pin positions; re-runs on resize so HTML overlays track the map
-  useEffect(() => {
-    if (!geojson) return;
-    const compute = () => {
-      const positions: Record<string, { x: number; y: number }> = {};
+  // Recalculates container-relative pin positions after the next paint so getScreenCTM is fresh
+  const recalcPinPositions = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (!svgRef.current || !containerRef.current) return;
+      const newPositions: Record<string, { x: number; y: number }> = {};
       locations.forEach((loc) => {
         const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
-        positions[loc.id] = getScreenPos(svgX, svgY);
+        const svg = svgRef.current!;
+        const pt = svg.createSVGPoint();
+        pt.x = svgX;
+        pt.y = svgY;
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return;
+        const screenPt = pt.matrixTransform(ctm);
+        const rect = containerRef.current!.getBoundingClientRect();
+        newPositions[loc.id] = {
+          x: screenPt.x - rect.left,
+          y: screenPt.y - rect.top,
+        };
       });
-      setPinPositions(positions);
-    };
-    compute();
-    window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
-  }, [geojson, locations, getScreenPos]);
+      setPinPositions(newPositions);
+    });
+  }, [locations]);
+
+  // Window resize listener (handles orientation changes and browser zoom)
+  useEffect(() => {
+    if (!geojson) return;
+    window.addEventListener("resize", recalcPinPositions);
+    return () => window.removeEventListener("resize", recalcPinPositions);
+  }, [geojson, recalcPinPositions]);
+
+  // ResizeObserver on the container (handles flex/grid layout shifts that window resize misses)
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver(() => recalcPinPositions());
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, [geojson, locations, recalcPinPositions]);
 
   // Main D3 effect: draws provinces + SVG decorations (pulse rings, edit overlays).
   // In view mode, pin images are rendered as HTML overlays instead of SVG <image> elements.
@@ -340,7 +363,9 @@ export default function PanamaMap() {
         pinEl.call(drag as any);
       }
     });
-  }, [geojson, locations, editMode, editingPinId, pendingPin, getScreenPos, screenToSvg]);
+
+    recalcPinPositions();
+  }, [geojson, locations, editMode, editingPinId, pendingPin, getScreenPos, screenToSvg, recalcPinPositions]);
 
   // SVG click: add new pin at clicked position (edit mode only, skips existing pins)
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
