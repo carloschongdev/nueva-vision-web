@@ -126,8 +126,8 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* ── CTA dinámico ───────────────────────────── */}
-        <div className="hidden md:block">
+        {/* ── CTA + Mercy logo ───────────────────────── */}
+        <div className="hidden md:flex items-center gap-3">
           <NextServiceCTA
             variant="amber"
             showBadge={true}
@@ -135,6 +135,23 @@ export default function Navbar() {
               !dark ? "shadow-lg shadow-amber-500/30" : ""
             }`}
           />
+          <a
+            href="https://www.mercychurchofgod.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+            title="Mercy Church of God"
+          >
+            <div className="bg-white rounded-lg px-2 py-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/mercy-church-usa.png"
+                alt="Mercy Church of God"
+                style={{ height: 40, width: "auto", display: "block" }}
+                className="object-contain"
+              />
+            </div>
+          </a>
         </div>
 
         {/* ── Hamburger ──────────────────────────────── */}

@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { initialLocations } from "@/lib/churches";
 
 const WazeIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -31,7 +35,18 @@ const services = [
   },
 ];
 
+// Strip the common long prefix for compact display
+function shortName(name: string): string {
+  return name.replace("Iglesia Nueva Visión La Misericordia ", "");
+}
+
+const MOBILE_LIMIT = 2;
+
 export default function ServiceTimes() {
+  const [mobileExpanded, setMobileExpanded] = useState(false);
+  const hiddenCount = initialLocations.length - MOBILE_LIMIT;
+  const mobileVisible = mobileExpanded ? initialLocations : initialLocations.slice(0, MOBILE_LIMIT);
+
   return (
     <section className="py-24 px-6 bg-stone-50 stripe-bg">
       <div className="max-w-7xl mx-auto">
@@ -67,30 +82,80 @@ export default function ServiceTimes() {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-7 py-5 bg-white rounded-2xl border shadow-sm"
-          style={{ borderColor: "rgba(26,10,36,0.08)" }}>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex items-center gap-2">
-              <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-                <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
-                <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Nueva Vision La Misericordia</span>
-              </a>
-              <a href="https://waze.com/ul?ll=8.99268,-79.72803&navigate=yes" target="_blank" rel="noopener noreferrer" aria-label="Abrir en Waze" title="Abrir en Waze" className="shrink-0 hover:scale-110 transition-transform duration-200">
-                <WazeIcon className="w-5 h-5" />
-              </a>
-            </div>
-            <span className="hidden sm:block text-navy-900/20 text-sm">•</span>
-            <div className="flex items-center gap-2">
-              <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-                <Image src="/mercy.svg" alt="Ubicación" width={20} height={20} className="object-contain shrink-0" />
-                <span className="font-sans text-sm text-navy-900/60 group-hover:text-primary-500 transition-colors duration-200">Iglesia Talita Cumi</span>
-              </a>
-              <a href="https://waze.com/ul?ll=9.18883,-79.62069&navigate=yes" target="_blank" rel="noopener noreferrer" aria-label="Abrir en Waze" title="Abrir en Waze" className="shrink-0 hover:scale-110 transition-transform duration-200">
-                <WazeIcon className="w-5 h-5" />
-              </a>
+        {/* Location bar */}
+        <div
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 py-4 bg-white rounded-2xl border shadow-sm"
+          style={{ borderColor: "rgba(26,10,36,0.08)" }}
+        >
+          {/* Desktop: horizontal scroll */}
+          <div
+            className="hidden sm:block flex-1 overflow-x-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
+          >
+            <div className="flex items-center gap-2 min-w-max pr-4">
+              {initialLocations.map((loc, i) => (
+                <div key={loc.id} className="flex items-center gap-2 shrink-0">
+                  {i > 0 && <span className="text-navy-900/20 text-sm">·</span>}
+                  <div className="flex items-center gap-1">
+                    <Image src="/mercy.svg" alt="" width={14} height={14} className="object-contain shrink-0" />
+                    <a
+                      href={loc.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors whitespace-nowrap"
+                    >
+                      {shortName(loc.name)}
+                    </a>
+                    <a
+                      href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Waze: ${shortName(loc.name)}`}
+                      className="shrink-0 hover:scale-110 transition-transform"
+                    >
+                      <WazeIcon className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <Link href="/contact" className="btn-primary text-xs py-2.5">Ver mapa →</Link>
+
+          {/* Mobile: stacked, limited */}
+          <div className="sm:hidden flex flex-col gap-2 w-full">
+            {mobileVisible.map((loc) => (
+              <div key={loc.id} className="flex items-center gap-1.5">
+                <Image src="/mercy.svg" alt="" width={14} height={14} className="object-contain shrink-0" />
+                <a
+                  href={loc.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors flex-1"
+                >
+                  {shortName(loc.name)}
+                </a>
+                <a
+                  href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Waze: ${shortName(loc.name)}`}
+                  className="shrink-0 hover:scale-110 transition-transform"
+                >
+                  <WazeIcon className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            ))}
+            {!mobileExpanded && hiddenCount > 0 && (
+              <button
+                onClick={() => setMobileExpanded(true)}
+                className="text-xs text-primary-500 font-sans font-medium text-left hover:text-primary-700 transition-colors"
+              >
+                ... y {hiddenCount} más
+              </button>
+            )}
+          </div>
+
+          <Link href="/contact" className="btn-primary text-xs py-2.5 shrink-0">Ver mapa →</Link>
         </div>
       </div>
     </section>
