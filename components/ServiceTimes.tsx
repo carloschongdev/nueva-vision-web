@@ -51,9 +51,7 @@ export default function ServiceTimes() {
                 s.featured ? "bg-primary-900 shadow-xl shadow-primary-900/20" : "bg-white shadow-sm hover:shadow-md"
               }`}
               style={!s.featured ? { border: "1px solid rgba(26,10,36,0.08)" } : {}}>
-              <span className={`text-xs font-semibold uppercase tracking-widest mb-2 block ${s.featured ? "text-primary-300" : "text-primary-500"}`}>
-                {s.tag}
-              </span>
+              <span className="sr-only">{s.tag}</span>
               <h3 className={`font-display text-3xl font-semibold mb-5 ${s.featured ? "text-white" : "text-primary-900"}`}>{s.day}</h3>
               <div className="space-y-3">
                 {s.schedule.map((item) => (

@@ -10,7 +10,7 @@ import PanamaMap from "@/components/PanamaMap";
 export const metadata: Metadata = {
   title: "Iglesia Nueva Visión La Misericordia",
   description:
-    "Iglesia Nueva Visión La Misericordia en Panamá. Cultos martes, viernes y domingos. Un lugar donde puedes conocer a Dios.",
+    "Iglesia Nueva Visión La Misericordia en Panamá. Cultos martes, viernes y domingos. Un refugio en la presencia de Dios.",
 };
 
 const values = [

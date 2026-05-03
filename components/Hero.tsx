@@ -29,17 +29,17 @@ export default function Hero() {
             </div>
 
             <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold text-white leading-none mb-8 animate-slide-up opacity-0 delay-200">
-              Un lugar donde
+              Un refugio en la
               <br />
-              <span className="italic text-primary-300">puedes conocer</span>
+              <span className="italic text-primary-300">presencia</span>
               <br />
-              a Dios
+              de Dios
             </h1>
 
             <p className="font-sans text-lg text-white/70 max-w-lg mb-10 leading-relaxed animate-slide-up opacity-0 delay-300">
-              Una comunidad de fe en Panamá, donde cada persona es bienvenida
-              sin importar su historia. Aquí encontrarás propósito, amor y
-              comunidad genuina.
+              Somos una iglesia en Panamá donde puedes encontrarte con Dios
+              y ser transformado(a), y donde lo imposible comienza a tomar
+              forma en la presencia de Dios.
             </p>
 
             <div className="flex flex-wrap gap-4 animate-slide-up opacity-0 delay-400">
@@ -60,7 +60,7 @@ export default function Hero() {
           <div className="mt-16 grid grid-cols-3 gap-px bg-white/10 rounded-2xl overflow-hidden max-w-2xl animate-fade-in opacity-0 delay-600">
             {[
               { num: "3",     label: "Cultos semanales" },
-              { num: "+15",   label: "Años de ministerio" },
+              { num: "+30",   label: "Años de ministerio" },
               { num: "Todos", label: "Son bienvenidos" },
             ].map((s) => (
               <div key={s.label} className="bg-primary-950/60 backdrop-blur-sm px-6 py-5 text-center">
