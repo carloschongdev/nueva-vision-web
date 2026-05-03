@@ -32,9 +32,11 @@ const services = [
   },
 ];
 
-// Strip the common long prefix for compact display
-function shortName(name: string): string {
-  return name.replace("Iglesia Nueva Visión La Misericordia ", "");
+function getFullName(name: string): string {
+  if (name.includes("Iglesia") || name.includes("Ministerio") || name.includes("Cristo")) {
+    return name;
+  }
+  return `Iglesia Nueva Visión La Misericordia ${name}`;
 }
 
 export default function ServiceTimes() {
@@ -88,13 +90,13 @@ export default function ServiceTimes() {
                   rel="noopener noreferrer"
                   className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors"
                 >
-                  {shortName(loc.name)}
+                  {getFullName(loc.name)}
                 </a>
                 <a
                   href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Waze: ${shortName(loc.name)}`}
+                  aria-label={`Waze: ${getFullName(loc.name)}`}
                   className="shrink-0 hover:scale-110 transition-transform"
                 >
                   <WazeIcon className="w-3.5 h-3.5" />
