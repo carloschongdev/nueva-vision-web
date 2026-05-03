@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { initialLocations } from "@/lib/churches";
@@ -40,13 +37,7 @@ function shortName(name: string): string {
   return name.replace("Iglesia Nueva Visión La Misericordia ", "");
 }
 
-const MOBILE_LIMIT = 2;
-
 export default function ServiceTimes() {
-  const [mobileExpanded, setMobileExpanded] = useState(false);
-  const hiddenCount = initialLocations.length - MOBILE_LIMIT;
-  const mobileVisible = mobileExpanded ? initialLocations : initialLocations.slice(0, MOBILE_LIMIT);
-
   return (
     <section className="py-24 px-6 bg-stone-50 stripe-bg">
       <div className="max-w-7xl mx-auto">
@@ -84,53 +75,18 @@ export default function ServiceTimes() {
 
         {/* Location bar */}
         <div
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 py-4 bg-white rounded-2xl border shadow-sm"
+          className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 px-4 py-3 bg-white rounded-2xl border shadow-sm"
           style={{ borderColor: "rgba(26,10,36,0.08)" }}
         >
-          {/* Desktop: horizontal scroll */}
-          <div
-            className="hidden sm:block flex-1 overflow-x-auto"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
-          >
-            <div className="flex items-center gap-2 min-w-max pr-4">
-              {initialLocations.map((loc, i) => (
-                <div key={loc.id} className="flex items-center gap-2 shrink-0">
-                  {i > 0 && <span className="text-navy-900/20 text-sm">·</span>}
-                  <div className="flex items-center gap-1">
-                    <Image src="/mercy.svg" alt="" width={14} height={14} className="object-contain shrink-0" />
-                    <a
-                      href={loc.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors whitespace-nowrap"
-                    >
-                      {shortName(loc.name)}
-                    </a>
-                    <a
-                      href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Waze: ${shortName(loc.name)}`}
-                      className="shrink-0 hover:scale-110 transition-transform"
-                    >
-                      <WazeIcon className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile: stacked, limited */}
-          <div className="sm:hidden flex flex-col gap-2 w-full">
-            {mobileVisible.map((loc) => (
-              <div key={loc.id} className="flex items-center gap-1.5">
+          <div className="flex flex-wrap gap-x-4 gap-y-2 items-center flex-1">
+            {initialLocations.map((loc) => (
+              <div key={loc.id} className="flex items-center gap-1 whitespace-nowrap">
                 <Image src="/mercy.svg" alt="" width={14} height={14} className="object-contain shrink-0" />
                 <a
                   href={loc.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors flex-1"
+                  className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors"
                 >
                   {shortName(loc.name)}
                 </a>
@@ -145,17 +101,8 @@ export default function ServiceTimes() {
                 </a>
               </div>
             ))}
-            {!mobileExpanded && hiddenCount > 0 && (
-              <button
-                onClick={() => setMobileExpanded(true)}
-                className="text-xs text-primary-500 font-sans font-medium text-left hover:text-primary-700 transition-colors"
-              >
-                ... y {hiddenCount} más
-              </button>
-            )}
           </div>
-
-          <Link href="/contact" className="btn-primary text-xs py-2.5 shrink-0">Ver mapa →</Link>
+          <Link href="/contact" className="btn-primary text-xs py-2.5 shrink-0 self-center sm:self-start">Ver mapa →</Link>
         </div>
       </div>
     </section>
