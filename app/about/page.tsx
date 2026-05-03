@@ -51,23 +51,18 @@ const misionItems = [
 
 const team = [
   {
-    name: "Pastor Principal",
-    role: "Liderazgo pastoral",
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+    name: "Pastor Joshua Encarnación",
+    role: "Iglesia Nueva Visión La Misericordia · Arraiján",
+    img: "/Pastor-Joshua.png",
     bio: "Apasionado por ver vidas transformadas por la Palabra de Dios. Sirve a la congregación con humildad y visión.",
   },
   {
-    name: "Pastora de Damas",
-    role: "Ministerio femenino",
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
+    name: "Pastora Verónica de Encarnación",
+    role: "Iglesia Nueva Visión La Misericordia · Arraiján",
+    img: "/Pastora-Veronica.png",
     bio: "Lidera el ministerio de mujeres con amor práctico, enseñanza bíblica y un corazón de servicio.",
   },
-  {
-    name: "Director de Alabanza",
-    role: "Ministerio de música",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-    bio: "Guía a la congregación en experiencias de adoración genuina, preparando cada culto con excelencia.",
-  },
+  // TODO: agregar cuando se confirmen más pastores
 ];
 
 export default function AboutPage() {
@@ -290,7 +285,7 @@ export default function AboutPage() {
             italicPart="equipo pastoral"
             subtitle="Siervos llamados y apasionados por ver a la iglesia crecer en amor y madurez."
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {team.map((p) => (
               <div
                 key={p.name}
@@ -303,7 +298,7 @@ export default function AboutPage() {
                     alt={p.name}
                     fill
                     className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-900/60 to-transparent" />
                 </div>
