@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
+import { initialLocations } from "@/lib/churches";
+
+const provinceNames: Record<string, string> = {
+  PA5: "Darién", PA8: "Panamá", PA10: "Panamá Oeste",
+  PA1: "Bocas del Toro", PA2: "Coclé", PA3: "Colón",
+  PA4: "Chiriquí", PA6: "Herrera", PA7: "Los Santos",
+  PA9: "Veraguas",
+};
 
 export const metadata: Metadata = {
   title: "Sobre Nosotros",
@@ -311,6 +319,52 @@ export default function AboutPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── NUESTRAS IGLESIAS ─────────────────────────── */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <SectionHeader
+            eyebrow="Red de iglesias"
+            title="Nuestras"
+            italicPart="iglesias"
+            subtitle="Un ministerio en expansión, llevando el Evangelio a cada comunidad de Panamá."
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {initialLocations
+              .filter((loc) => loc.id !== "arraijan")
+              .map((loc) => (
+                <div
+                  key={loc.id}
+                  className="bg-white rounded-xl p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col gap-4"
+                  style={{ border: "1px solid rgba(8,15,46,0.08)" }}
+                >
+                  <div className="flex items-start gap-3">
+                    <Image src="/mercy.svg" alt="" width={40} height={40} className="object-contain shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="font-sans font-semibold text-sm text-navy-900 leading-snug">{loc.name}</p>
+                      <p className="font-sans text-xs text-navy-900/50 mt-0.5">{provinceNames[loc.province] ?? loc.province}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className={`text-xs font-sans font-semibold px-2.5 py-1 rounded-full ${
+                      loc.active
+                        ? "bg-primary-100 text-primary-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {loc.active ? "Activa" : "Próximamente"}
+                    </span>
+                    <Link
+                      href={`/iglesias/${loc.id}`}
+                      className="text-xs font-sans font-semibold text-primary-500 hover:text-primary-700 transition-colors"
+                    >
+                      Ver historia →
+                    </Link>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </section>
