@@ -73,6 +73,10 @@ export default function DonationsSection() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <span className="font-sans text-sm text-primary-900/60">Banco</span>
+                    <span className="font-sans font-semibold text-sm text-primary-900">Banco General</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-sans text-sm text-primary-900/60">Nombre</span>
                     <span className="font-sans font-semibold text-sm text-primary-900">La Misericordia</span>
                   </div>
                   <div className="flex justify-between items-center">

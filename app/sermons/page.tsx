@@ -13,17 +13,17 @@ const featured = {
   speaker: "Pastor Juan Carlos Harrigan",
   date: "2024",
   series: "Predicaciones",
-  videoId: "L4sVHFQIWxI",
+  videoId: "SzwtR7eKTKA",
   description: "Un mensaje poderoso del Pastor Juan Carlos Harrigan para fortalecer tu fe y creer en las promesas de Dios.",
 };
 
 const sermons = [
-  { title: "Tú Lo Vas a Alcanzar",   speaker: "Pastor Juan Carlos Harrigan", date: "2024", series: "Predicaciones", videoId: "L4sVHFQIWxI",  duration: "" },
-  { title: "No Sigas Escogiendo Mal", speaker: "Juan Pablo Lerman",           date: "2024", series: "Predicaciones", videoId: "Wj3mSE3JjsU",  duration: "" },
-  { title: "Ordena Tu Casa",          speaker: "Pastor Ernesto Cuevas",       date: "2025", series: "Predicaciones", videoId: "8LTlVQAiVfU",  duration: "" },
-  { title: "Dios Te Levantará",       speaker: "Juan Pablo Lerman",           date: "2025", series: "Predicaciones", videoId: "VuA2JFt0OAg",  duration: "" },
-  { title: "El Favor de Dios",        speaker: "Predicación Cristiana",       date: "2025", series: "Predicaciones", videoId: "N1TpuBs5RnI",  duration: "" },
-  { title: "Confía en el Señor",      speaker: "Predicación Cristiana",       date: "2025", series: "Predicaciones", videoId: "9oJqFUuGp2E",  duration: "" },
+  { title: "No Sigas Escogiendo Mal", speaker: "Juan Pablo Lerman",              date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
+  { title: "Ordena Tu Casa",          speaker: "Pastor Ernesto Cuevas",          date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
+  { title: "Yahweh Se Manifestará",   speaker: "Oasis Ministry",                 date: "2021", series: "Alabanza",       videoId: "Qem0WSJXLCE", duration: "" },
+  { title: "Háblame De Cerca",        speaker: "Grupo Grace & Kairo Worship",    date: "2026", series: "Alabanza",       videoId: "0pwd1dFwWDI", duration: "" },
+  { title: "Dios Te Levantará",       speaker: "Juan Pablo Lerman",              date: "2025", series: "Predicaciones", videoId: "DbHMisO7AGg", duration: "" },
+  { title: "Barro",                   speaker: "Kairo Worship ft. Joe L Barnes", date: "2024", series: "Alabanza",       videoId: "VGKSLzCJWoY", duration: "" },
 ];
 
 export default function SermonsPage() {
