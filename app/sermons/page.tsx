@@ -18,12 +18,12 @@ const featured = {
 };
 
 const sermons = [
-  { title: "No Sigas Escogiendo Mal",      speaker: "Juan Pablo Lerman",           date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
-  { title: "Ordena Tu Casa",               speaker: "Pastor Ernesio Cuevas",       date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
-  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "L4sVHFQIWxI", duration: "" },
-  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "Wj3mSE3JjsU", duration: "" },
-  { title: "Dios Te Levantará",            speaker: "Juan Pablo Lerman",           date: "2025", series: "Predicaciones", videoId: "KTFDFmAkRHE", duration: "" },
-  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "8LTlVQAiVfU", duration: "" },
+  { title: "No Sigas Escogiendo Mal",                    speaker: "Juan Pablo Lerman",     date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
+  { title: "Ordena Tu Casa",                             speaker: "Pastor Ernesto Cuevas", date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
+  { title: "Lo Que Te Quita La Paz No Viene De Dios",   speaker: "Juan Carlos Harrigan",  date: "2024", series: "Predicaciones", videoId: "sVlhMWf86bk", duration: "" },
+  { title: "Permanece Firme",                            speaker: "Juan Carlos Harrigan",  date: "2024", series: "Predicaciones", videoId: "EyuQJenVQcM", duration: "" },
+  { title: "Dios Te Levantará",                          speaker: "Juan Pablo Lerman",     date: "2023", series: "Predicaciones", videoId: "Jfw_vPW6tqI", duration: "" },
+  { title: "Dios No Nos Ha Dado Espíritu de Cobardía",  speaker: "Pastor Ernesto Cuevas", date: "2025", series: "Predicaciones", videoId: "_BZ1mTaHttM", duration: "" },
 ];
 
 export default function SermonsPage() {
