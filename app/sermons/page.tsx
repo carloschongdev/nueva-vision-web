@@ -18,12 +18,12 @@ const featured = {
 };
 
 const sermons = [
-  { title: "No Sigas Escogiendo Mal", speaker: "Juan Pablo Lerman",     date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
-  { title: "Ordena Tu Casa",          speaker: "Pastor Ernesto Cuevas", date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
-  { title: "El Poder de la Fe",       speaker: "Predicas Cristianas",   date: "2024", series: "Predicaciones", videoId: "YkgkThdzX-8", duration: "" },
-  { title: "Mensaje de Vida",         speaker: "Predicas Cristianas",   date: "2024", series: "Predicaciones", videoId: "vYTDCe7n67k", duration: "" },
-  { title: "Dios Te Levantará",       speaker: "Juan Pablo Lerman",     date: "2025", series: "Predicaciones", videoId: "DbHMisO7AGg", duration: "" },
-  { title: "Palabra que Transforma",  speaker: "Predicas Cristianas",   date: "2024", series: "Predicaciones", videoId: "vkInpwCNwwU", duration: "" },
+  { title: "No Sigas Escogiendo Mal",      speaker: "Juan Pablo Lerman",           date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
+  { title: "Ordena Tu Casa",               speaker: "Pastor Ernesio Cuevas",       date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
+  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "L4sVHFQIWxI", duration: "" },
+  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "Wj3mSE3JjsU", duration: "" },
+  { title: "Dios Te Levantará",            speaker: "Juan Pablo Lerman",           date: "2025", series: "Predicaciones", videoId: "KTFDFmAkRHE", duration: "" },
+  { title: "Mensaje de Juan C. Harrigan",  speaker: "Juan Carlos Harrigan Oficial", date: "2024", series: "Predicaciones", videoId: "8LTlVQAiVfU", duration: "" },
 ];
 
 export default function SermonsPage() {
