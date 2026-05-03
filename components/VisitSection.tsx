@@ -2,10 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const steps = [
-  { num: "01", title: "Llega tal como eres",   desc: "No hay código de vestimenta ni expectativas. Ven con autenticidad." },
-  { num: "02", title: "Sé bienvenido",          desc: "Nuestro equipo te recibirá y responderá tus preguntas desde el inicio." },
-  { num: "03", title: "Vive el culto",           desc: "Música de adoración, un mensaje bíblico relevante y un ambiente cálido." },
-  { num: "04", title: "Conéctate",              desc: "Quédate después, toma un café y conoce a nuestra familia." },
+  { num: "01", title: "Eres bienvenido",   desc: "Nuestro equipo te recibirá y responderá tus preguntas desde el inicio." },
+  { num: "02", title: "Vive el culto",     desc: "Música de adoración, un mensaje bíblico relevante y un ambiente cálido." },
+  { num: "03", title: "Conéctate",         desc: "Quédate después, toma un café y conoce a nuestra familia." },
 ];
 
 export default function VisitSection() {
@@ -36,7 +35,7 @@ export default function VisitSection() {
             </h2>
             <div className="divider" />
             <p className="font-sans text-primary-900/60 leading-relaxed mb-10 text-base">
-              En Nueva Visión La Misericordia encontrarás un ambiente seguro, sin presiones, donde todos son tratados con dignidad y amor.
+              Nueva Visión La Misericordia es un lugar donde Cristo es el centro de nuestras vidas. Él restaura tu interior, sana tus relaciones familiares y te da un propósito, todo para su gloria.
             </p>
             <div className="space-y-5 mb-10">
               {steps.map((step) => (

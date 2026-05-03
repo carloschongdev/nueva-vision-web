@@ -142,15 +142,13 @@ export default function Navbar() {
             className="hover:opacity-80 transition-opacity"
             title="Mercy Church of God"
           >
-            <div className="bg-white rounded-lg px-2 py-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/mercy-church-usa.png"
-                alt="Mercy Church of God"
-                style={{ height: 40, width: "auto", display: "block" }}
-                className="object-contain"
-              />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/mercy-church-usa.png"
+              alt="Mercy Church of God"
+              style={{ height: "40px", width: "auto", objectFit: "contain" }}
+              className="bg-white rounded-lg px-2 py-1"
+            />
           </a>
         </div>
 
