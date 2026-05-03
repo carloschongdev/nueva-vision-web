@@ -99,9 +99,7 @@ export default function SermonsPage() {
               </div>
             ))}
           </div>
-          <div className="mt-12 text-center">
-            <a href="https://youtube.com/@iglesianuevavisión" target="_blank" rel="noopener noreferrer" className="btn-primary">Suscribirse en YouTube</a>
-          </div>
+          {/* TODO: agregar cuando tengamos canal de YouTube oficial */}
         </div>
       </section>
 

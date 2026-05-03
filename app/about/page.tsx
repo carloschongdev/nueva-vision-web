@@ -34,8 +34,8 @@ const misionItems = [
   },
   {
     num: "02",
-    title: "Testigos hasta lo último de la tierra",
-    desc: "Testificar de Cristo, amando, sirviendo y proclamando Su nombre, desde nuestras puertas hasta los confines de la tierra, conforme a Hechos 1:8.",
+    title: "Siervos hasta lo último de la tierra",
+    desc: "Servir a Cristo, amando y proclamando Su nombre desde nuestras puertas hasta los confines de la tierra, conforme a Hechos 1:8.",
   },
   {
     num: "03",
@@ -213,7 +213,7 @@ export default function AboutPage() {
             </h2>
             <div className="divider-amber" />
             <p className="font-sans text-navy-900/60 leading-relaxed mb-4">
-              Somos testigos de Cristo, amando, sirviendo y proclamando Su nombre
+              Somos siervos de Cristo, amando, sirviendo y proclamando Su nombre
               desde nuestras puertas hasta los confines de la tierra.
             </p>
             <div className="p-5 rounded-2xl bg-navy-900 mt-6">
