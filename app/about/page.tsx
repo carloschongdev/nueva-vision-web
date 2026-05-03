@@ -112,11 +112,6 @@ export default function AboutPage() {
             </h2>
             <div className="divider-amber" />
             <p className="font-sans text-navy-900/60 leading-relaxed mb-4">
-              El nombre <strong className="text-navy-900">Nueva Visión La Misericordia</strong> — N.V.L.M. — representa un
-              ministerio de iglesias asociadas, legalmente organizadas en Panamá
-              con personería jurídica.
-            </p>
-            <p className="font-sans text-navy-900/60 leading-relaxed mb-4">
               Nuestro emblema es un logo de ubicación con una M dentro: símbolo
               de un lugar de misericordia de Dios. Donde quiera que sea visible
               este logo, refleja la bienaventuranza de ser misericordioso con
@@ -126,7 +121,7 @@ export default function AboutPage() {
             {/* Sede */}
             <div className="mt-6 p-5 rounded-2xl bg-stone-50 border" style={{ borderColor: "rgba(8,15,46,0.07)" }}>
               <p className="text-xs font-bold uppercase tracking-widest text-amber-500 mb-2">Sede Nacional</p>
-              <p className="font-sans text-navy-900 font-medium">Ciudad de Panamá · Darién · Garachiné</p>
+              <p className="font-sans text-navy-900 font-medium">Panamá · Darién · Garachiné</p>
             </div>
 
             {/* Versículo */}
@@ -332,40 +327,53 @@ export default function AboutPage() {
             italicPart="iglesias"
             subtitle="Un ministerio en expansión, llevando el Evangelio a cada comunidad de Panamá."
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {initialLocations
-              .filter((loc) => loc.id !== "arraijan")
-              .map((loc) => (
-                <div
-                  key={loc.id}
-                  className="bg-white rounded-xl p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col gap-4"
-                  style={{ border: "1px solid rgba(8,15,46,0.08)" }}
-                >
-                  <div className="flex items-start gap-3">
-                    <Image src="/mercy.svg" alt="" width={40} height={40} className="object-contain shrink-0 mt-0.5" />
-                    <div className="min-w-0">
-                      <p className="font-sans font-semibold text-sm text-navy-900 leading-snug">{loc.name}</p>
-                      <p className="font-sans text-xs text-navy-900/50 mt-0.5">{provinceNames[loc.province] ?? loc.province}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className={`text-xs font-sans font-semibold px-2.5 py-1 rounded-full ${
-                      loc.active
-                        ? "bg-primary-100 text-primary-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}>
-                      {loc.active ? "Activa" : "Próximamente"}
-                    </span>
-                    <Link
-                      href={`/iglesias/${loc.id}`}
-                      className="text-xs font-sans font-semibold text-primary-500 hover:text-primary-700 transition-colors"
+          {[
+            { title: "Panamá Oeste", province: "PA10" },
+            { title: "Panamá",       province: "PA8" },
+            { title: "Darién",       province: "PA5" },
+          ].map(({ title, province }) => {
+            const locs = initialLocations.filter((l) => l.province === province);
+            if (!locs.length) return null;
+            return (
+              <div key={province} className="mb-10">
+                <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-amber-500 mb-4">
+                  {title}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {locs.map((loc) => (
+                    <div
+                      key={loc.id}
+                      className="bg-white rounded-xl p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col gap-4"
+                      style={{ border: "1px solid rgba(8,15,46,0.08)" }}
                     >
-                      Ver historia →
-                    </Link>
-                  </div>
+                      <div className="flex items-start gap-3">
+                        <Image src="/mercy.svg" alt="" width={40} height={40} className="object-contain shrink-0 mt-0.5" />
+                        <div className="min-w-0">
+                          <p className="font-sans font-semibold text-sm text-navy-900 leading-snug">{loc.name}</p>
+                          <p className="font-sans text-xs text-navy-900/50 mt-0.5">{provinceNames[loc.province] ?? loc.province}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className={`text-xs font-sans font-semibold px-2.5 py-1 rounded-full ${
+                          loc.active
+                            ? "bg-primary-100 text-primary-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}>
+                          {loc.active ? "Activa" : "Próximamente"}
+                        </span>
+                        <Link
+                          href={`/iglesias/${loc.id}`}
+                          className="text-xs font-sans font-semibold text-primary-500 hover:text-primary-700 transition-colors"
+                        >
+                          Ver historia →
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

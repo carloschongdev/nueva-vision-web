@@ -6,6 +6,7 @@ import VisitSection from "@/components/VisitSection";
 import SectionHeader from "@/components/SectionHeader";
 import NextServiceCTA from "@/components/NextServiceCTA";
 import PanamaMap from "@/components/PanamaMap";
+import DonationsSection from "@/components/DonationsSection";
 
 export const metadata: Metadata = {
   title: "Iglesia Nueva Visión La Misericordia",
@@ -95,7 +96,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonies */}
+      {/* TODO: descomentar cuando tengamos testimonios reales
       <section className="py-24 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
@@ -123,6 +124,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      */}
+
+      <DonationsSection />
 
       {/* CTA final */}
       <section className="py-24 px-6 bg-primary-900 relative overflow-hidden">

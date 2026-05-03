@@ -4,8 +4,8 @@ import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 
 export const metadata: Metadata = {
-  title: "Mensajes y Alabanza",
-  description: "Predicaciones y alabanza cristiana en español para edificar tu fe y acercarte a Dios.",
+  title: "Predicaciones",
+  description: "Mensajes de vida para edificar tu fe. Escucha la Palabra de Dios y crece espiritualmente.",
 };
 
 const featured = {
@@ -13,17 +13,17 @@ const featured = {
   speaker: "Pastor Juan Carlos Harrigan",
   date: "2024",
   series: "Predicaciones",
-  videoId: "SzwtR7eKTKA",
+  videoId: "L4sVHFQIWxI",
   description: "Un mensaje poderoso del Pastor Juan Carlos Harrigan para fortalecer tu fe y creer en las promesas de Dios.",
 };
 
 const sermons = [
-  { title: "No Sigas Escogiendo Mal",          speaker: "Juan Pablo Lerman",              date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
-  { title: "Ordena Tu Casa",                   speaker: "Pastor Ernesto Cuevas",          date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
-  { title: "Yahweh Se Manifestará",            speaker: "Oasis Ministry",                 date: "2021", series: "Alabanza",       videoId: "Qem0WSJXLCE", duration: "" },
-  { title: "Háblame De Cerca",                 speaker: "Grupo Grace & Kairo Worship",    date: "2026", series: "Alabanza",       videoId: "0pwd1dFwWDI", duration: "" },
-  { title: "Dios Te Levantará",                speaker: "Juan Pablo Lerman",              date: "2025", series: "Predicaciones", videoId: "DbHMisO7AGg", duration: "" },
-  { title: "Barro",                            speaker: "Kairo Worship ft. Joe L Barnes", date: "2024", series: "Alabanza",       videoId: "VGKSLzCJWoY", duration: "" },
+  { title: "Tú Lo Vas a Alcanzar",   speaker: "Pastor Juan Carlos Harrigan", date: "2024", series: "Predicaciones", videoId: "L4sVHFQIWxI",  duration: "" },
+  { title: "No Sigas Escogiendo Mal", speaker: "Juan Pablo Lerman",           date: "2024", series: "Predicaciones", videoId: "Wj3mSE3JjsU",  duration: "" },
+  { title: "Ordena Tu Casa",          speaker: "Pastor Ernesto Cuevas",       date: "2025", series: "Predicaciones", videoId: "8LTlVQAiVfU",  duration: "" },
+  { title: "Dios Te Levantará",       speaker: "Juan Pablo Lerman",           date: "2025", series: "Predicaciones", videoId: "VuA2JFt0OAg",  duration: "" },
+  { title: "El Favor de Dios",        speaker: "Predicación Cristiana",       date: "2025", series: "Predicaciones", videoId: "N1TpuBs5RnI",  duration: "" },
+  { title: "Confía en el Señor",      speaker: "Predicación Cristiana",       date: "2025", series: "Predicaciones", videoId: "9oJqFUuGp2E",  duration: "" },
 ];
 
 export default function SermonsPage() {
@@ -32,10 +32,12 @@ export default function SermonsPage() {
       <section className="relative pt-40 pb-20 px-6 bg-primary-900 overflow-hidden">
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-primary-500 to-transparent opacity-50" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <p className="text-primary-300 text-xs font-bold uppercase tracking-[0.35em] mb-5">Alabanza y adoración</p>
-          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Mensajes y Alabanza</h1>
+          <p className="text-primary-300 text-xs font-bold uppercase tracking-[0.35em] mb-5">Predicaciones</p>
+          <h1 className="font-display text-5xl md:text-6xl font-semibold text-white leading-none mb-5">Predicaciones</h1>
           <div className="w-12 h-1 rounded-full bg-primary-500 mb-5" />
-          <p className="font-sans text-white/55 text-lg max-w-2xl leading-relaxed">Adora a Dios desde donde estás. Videos de alabanza y adoración para acompañar tu tiempo con Él.</p>
+          <p className="font-sans text-white/55 text-lg max-w-2xl leading-relaxed">
+            Mensajes de vida para edificar tu fe. Escucha la Palabra de Dios y crece espiritualmente.
+          </p>
         </div>
       </section>
 
@@ -70,7 +72,7 @@ export default function SermonsPage() {
 
       <section className="py-16 px-6 bg-stone-50 stripe-bg">
         <div className="max-w-7xl mx-auto">
-          <SectionHeader eyebrow="Videos" title="Alabanza" italicPart="de alabanza" subtitle="Revive los mensajes que han impactado a nuestra congregación." />
+          <SectionHeader eyebrow="Videos" title="Predicaciones" italicPart="recientes" subtitle="Mensajes que han impactado a nuestra congregación." />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {sermons.map((s) => (
               <div key={s.title} className="bg-white rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 group shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.07)" }}>
@@ -109,7 +111,7 @@ export default function SermonsPage() {
         </h2>
         <div className="w-12 h-1 rounded-full bg-primary-500 mx-auto mb-5" />
         <p className="font-sans text-primary-900/55 text-base mb-8 max-w-md mx-auto">Nada reemplaza estar presente en comunidad.</p>
-        <Link href="/contact" className="btn-primary">Ven a adorar en persona</Link>
+        <Link href="/contact" className="btn-primary">Ven a escuchar la Palabra en persona</Link>
       </section>
     </>
   );

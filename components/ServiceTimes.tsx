@@ -39,6 +39,21 @@ function getFullName(name: string): string {
   return `Iglesia Nueva Visión La Misericordia ${name}`;
 }
 
+const locationGroups = [
+  {
+    region: "Panamá Oeste",
+    locs: initialLocations.filter((l) => l.province === "PA10"),
+  },
+  {
+    region: "Panamá",
+    locs: initialLocations.filter((l) => l.province === "PA8"),
+  },
+  {
+    region: "Darién",
+    locs: initialLocations.filter((l) => l.province === "PA5"),
+  },
+];
+
 export default function ServiceTimes() {
   return (
     <section className="py-24 px-6 bg-stone-50 stripe-bg">
@@ -75,36 +90,47 @@ export default function ServiceTimes() {
           ))}
         </div>
 
-        {/* Location bar */}
-        <div
-          className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 px-4 py-3 bg-white rounded-2xl border shadow-sm"
-          style={{ borderColor: "rgba(26,10,36,0.08)" }}
-        >
-          <div className="flex flex-wrap gap-x-4 gap-y-2 items-center flex-1">
-            {initialLocations.map((loc) => (
-              <div key={loc.id} className="flex items-center gap-1 whitespace-nowrap">
-                <Image src="/mercy.svg" alt="" width={14} height={14} className="object-contain shrink-0" />
-                <a
-                  href={loc.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-sans text-xs text-navy-900/60 hover:text-primary-500 transition-colors"
-                >
-                  {getFullName(loc.name)}
-                </a>
-                <a
-                  href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Waze: ${getFullName(loc.name)}`}
-                  className="shrink-0 hover:scale-110 transition-transform"
-                >
-                  <WazeIcon className="w-3.5 h-3.5" />
-                </a>
+        {/* Location cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          {locationGroups.map((group) => (
+            <div
+              key={group.region}
+              className="bg-white rounded-xl p-4 shadow-sm"
+              style={{ border: "1px solid rgba(26,10,36,0.08)" }}
+            >
+              <p className="text-primary-500 text-xs font-bold uppercase tracking-widest mb-3">
+                {group.region}
+              </p>
+              <div className="space-y-2">
+                {group.locs.map((loc) => (
+                  <div key={loc.id} className="flex items-center gap-1.5">
+                    <Image src="/mercy.svg" alt="" width={12} height={12} className="object-contain shrink-0" />
+                    <a
+                      href={loc.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-sans text-xs text-primary-900/70 hover:text-primary-500 transition-colors flex-1 leading-snug"
+                    >
+                      {getFullName(loc.name)}
+                    </a>
+                    <a
+                      href={`https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Waze: ${getFullName(loc.name)}`}
+                      className="shrink-0 hover:scale-110 transition-transform"
+                    >
+                      <WazeIcon className="w-3 h-3" />
+                    </a>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <Link href="/contact" className="btn-primary text-xs py-2.5 shrink-0 self-center sm:self-start">Ver mapa →</Link>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-end">
+          <Link href="/contact" className="btn-primary text-xs py-2.5">Ver mapa →</Link>
         </div>
       </div>
     </section>

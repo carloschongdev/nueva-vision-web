@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import SectionHeader from "@/components/SectionHeader";
+import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -32,23 +30,18 @@ export default function ContactPage() {
 
       {/* Info cards */}
       <section className="py-12 px-6 bg-stone-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { icon: "📍", label: "Dirección", value: "Arraiján, Panamá", sub: "Ver en mapa →",    href: "https://maps.app.goo.gl/JqhSGcCpx4qV5QRWA" },
-            { icon: "📞", label: "Teléfono",  value: "+507 6000-0000",   sub: "Lun–Vie, 9AM–5PM",href: "tel:+50760000000" },
-            { icon: "✉️", label: "Email",     value: "nuevavisionpty@gmail.com", sub: "Respondemos en 24h",href: "mailto:nuevavisionpty@gmail.com" },
-            { icon: "💬", label: "WhatsApp",  value: "+507 6000-0000",   sub: "Escríbenos ahora", href: "https://wa.me/50760000000" },
+            { icon: "📞", label: "Teléfono",  value: "+507 6000-0000",         sub: "Lun–Vie, 9AM–5PM",  href: "tel:+50760000000" },
+            { icon: "✉️", label: "Email",     value: "nuevavisionpty@gmail.com", sub: "Respondemos en 24h", href: "mailto:nuevavisionpty@gmail.com" },
+            { icon: "💬", label: "WhatsApp",  value: "+507 6000-0000",         sub: "Escríbenos ahora",   href: "https://wa.me/50760000000" },
           ].map((item) => (
             <a key={item.label} href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 group block shadow-sm"
               style={{ border: "1px solid rgba(26,10,36,0.07)" }}
             >
               <div className="mb-4">
-                {item.label === "Dirección" ? (
-                  <Image src="/mercy.svg" width={32} height={32} alt="Ubicación" className="object-contain" />
-                ) : (
-                  <span className="text-3xl">{item.icon}</span>
-                )}
+                <span className="text-3xl">{item.icon}</span>
               </div>
               <p className="text-primary-900/40 text-xs font-bold uppercase tracking-widest mb-1">{item.label}</p>
               <p className="font-sans font-semibold text-primary-900 text-sm mb-1">{item.value}</p>
@@ -58,91 +51,14 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Form + Map */}
+      {/* Form + Schedule */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-          {/* Form */}
-          <div>
-            <SectionHeader eyebrow="Escríbenos" title="Envía un" italicPart="mensaje" centered={false} />
-            {/* Para producción conecta a Formspree: action="https://formspree.io/f/TU_ID" */}
-            <form className="space-y-4" action="#" method="POST">
-              <div className="grid grid-cols-2 gap-4">
-                {["Nombre", "Apellido"].map((f) => (
-                  <div key={f}>
-                    <label className="block text-xs text-primary-900/50 uppercase tracking-widest mb-1.5">{f}</label>
-                    <input type="text" name={f.toLowerCase()} placeholder={`Tu ${f.toLowerCase()}`}
-                      className="w-full px-4 py-3 rounded-xl bg-stone-50 text-primary-900 placeholder-primary-900/30 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 transition-all duration-200"
-                      style={{ border: "1px solid rgba(26,10,36,0.12)" }}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <label className="block text-xs text-primary-900/50 uppercase tracking-widest mb-1.5">Email</label>
-                <input type="email" name="email" required placeholder="tu@email.com"
-                  className="w-full px-4 py-3 rounded-xl bg-stone-50 text-primary-900 placeholder-primary-900/30 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 transition-all duration-200"
-                  style={{ border: "1px solid rgba(26,10,36,0.12)" }}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-primary-900/50 uppercase tracking-widest mb-1.5">Asunto</label>
-                <select name="subject" className="w-full px-4 py-3 rounded-xl bg-stone-50 text-primary-900 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 transition-all duration-200 appearance-none" style={{ border: "1px solid rgba(26,10,36,0.12)" }}>
-                  <option value="">Selecciona un tema</option>
-                  <option value="visit">Quiero visitar la iglesia</option>
-                  <option value="prayer">Petición de oración</option>
-                  <option value="groups">Grupos y ministerios</option>
-                  <option value="general">Pregunta general</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-primary-900/50 uppercase tracking-widest mb-1.5">Mensaje</label>
-                <textarea name="message" required rows={5} placeholder="¿En qué podemos servirte?"
-                  className="w-full px-4 py-3 rounded-xl bg-stone-50 text-primary-900 placeholder-primary-900/30 text-sm outline-none focus:ring-2 focus:ring-primary-500/30 transition-all duration-200 resize-none"
-                  style={{ border: "1px solid rgba(26,10,36,0.12)" }}
-                />
-              </div>
-              <button type="submit" className="btn-primary w-full justify-center py-4">Enviar mensaje</button>
-              <p className="text-primary-900/30 text-xs text-center">⚠️ Conecta a Formspree o Resend para producción.</p>
-            </form>
-          </div>
+          <ContactForm />
 
-          {/* Map + Schedule */}
+          {/* Schedule */}
           <div className="space-y-6">
-            <div>
-              <p className="text-primary-500 text-xs font-bold uppercase tracking-[0.35em] mb-4">Cómo llegar</p>
-              <div className="space-y-4">
-                <div>
-                  <div className="rounded-2xl overflow-hidden h-48 shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.08)" }}>
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d490.4!2d-79.7279901636073!3d8.992472214531723!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8faca1adb6eb2c9f%3A0xa2f6a7f194a8b1ce!2sNueva+Vision+La+Misericordia+Arraijan!5e0!3m2!1ses!2spa!4v1714000000000!5m2!1ses!2spa"
-                      width="100%" height="100%" style={{ border: 0 }}
-                      allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-                      title="Ubicación Iglesia Nueva Visión - Arraiján"
-                    />
-                  </div>
-                  <a href="https://www.google.com/maps?q=8.992472214531723,-79.7279901636073" target="_blank" rel="noopener noreferrer"
-                    className="text-primary-900/40 text-xs mt-2 text-center block hover:text-primary-500 transition-colors duration-200">
-                    📍 Iglesia Nueva Visión La Misericordia · Arraiján ↗
-                  </a>
-                </div>
-                <div>
-                  <div className="rounded-2xl overflow-hidden h-48 shadow-sm" style={{ border: "1px solid rgba(26,10,36,0.08)" }}>
-                    <iframe
-                      src="https://maps.google.com/maps?q=9.188834975184063,-79.6206907357167&z=15&output=embed"
-                      width="100%" height="100%" style={{ border: 0 }}
-                      allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-                      title="Ubicación Talita Cumi"
-                    />
-                  </div>
-                  <a href="https://www.google.com/maps?q=9.188834975184063,-79.6206907357167" target="_blank" rel="noopener noreferrer"
-                    className="text-primary-900/40 text-xs mt-2 text-center block hover:text-primary-500 transition-colors duration-200">
-                    📍 Talita Cumi · República de Panamá ↗
-                  </a>
-                </div>
-              </div>
-            </div>
-
             <div className="rounded-2xl p-7 bg-primary-900">
               <h3 className="font-display text-xl font-semibold text-white mb-5">Horario semanal</h3>
               <div className="space-y-3">
