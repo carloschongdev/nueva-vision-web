@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import Image from "next/image";
+import { type Location, initialLocations } from "@/lib/churches";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -63,7 +64,7 @@ function buildInverseProjection() {
 
 const projectLatLng = buildForwardProjection();
 const pixelToLatLng = buildInverseProjection();
-const SVG_W = 1000, SVG_H = 421;
+const SVG_W = 1000, SVG_H = 500;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const WazeIcon = ({ className }: { className?: string }) => (
@@ -75,46 +76,8 @@ const WazeIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type Location = {
-  id: string; name: string; province: string;
-  coords: [number, number]; mapsUrl: string; active: boolean;
-};
 type EditForm = { name: string; active: boolean; lat: string; lng: string; mapsUrl: string };
 
-const initialLocations: Location[] = [
-  {
-    id: "arraijan",
-    name: "Iglesia Nueva Visión La Misericordia Arraiján",
-    province: "PA10",
-    coords: [-79.72803129743886, 8.99268298428215],
-    mapsUrl: "https://www.google.com/maps?q=8.99268298428215,-79.72803129743886",
-    active: true,
-  },
-  {
-    id: "talitacumi",
-    name: "Talita Cumi",
-    province: "PA8",
-    coords: [-79.62069616554106, 9.188830251741543],
-    mapsUrl: "https://www.google.com/maps?q=9.188830251741543,-79.62069616554106",
-    active: true,
-  },
-  {
-    id: "darien",
-    name: "Darién",
-    province: "PA5",
-    coords: [-77.7, 7.7],
-    mapsUrl: "https://www.google.com/maps?q=7.7,-77.7",
-    active: false,
-  },
-  {
-    id: "garachinae",
-    name: "Garachiné",
-    province: "PA5",
-    coords: [-78.3667, 6.7167],
-    mapsUrl: "https://www.google.com/maps?q=6.7167,-78.3667",
-    active: false,
-  },
-];
 
 export default function PanamaMap() {
   const svgRef       = useRef<SVGSVGElement>(null);
@@ -212,6 +175,7 @@ export default function PanamaMap() {
           y: screenPt.y - rect.top,
         };
       });
+
       setPinPositions(newPositions);
     });
   }, [locations]);
@@ -497,7 +461,7 @@ export default function PanamaMap() {
       <div
         ref={containerRef}
         className="relative w-full rounded-xl overflow-hidden"
-        style={{ aspectRatio: "1000/421", height: "auto" }}
+        style={{ aspectRatio: "1000/500", height: "auto" }}
       >
         {/* SVG: provinces, province labels, pulse rings, edit overlays */}
         <svg
@@ -512,12 +476,12 @@ export default function PanamaMap() {
 
         {/* View-mode pin overlays — real HTML <a> links, positioned via getScreenCTM */}
         {!editMode && (() => {
-          const pinW = Math.max(16, Math.round(28 * pinScale));
-          const pinH = Math.max(21, Math.round(38 * pinScale));
+          const pinW = Math.max(14, Math.round(22 * pinScale));
+          const pinH = Math.max(19, Math.round(30 * pinScale));
           return locations.map((loc) => {
           const pos = pinPositions[loc.id];
           if (!pos) return null;
-          const style: React.CSSProperties = {
+          const baseStyle: React.CSSProperties = {
             position: "absolute",
             left: pos.x - pinW / 2,
             top: pos.y - pinH,
@@ -525,6 +489,8 @@ export default function PanamaMap() {
             height: pinH,
             zIndex: 10,
             display: "block",
+            transition: "transform 0.15s ease",
+            transformOrigin: "bottom center",
           };
           if (loc.active) {
             return (
@@ -533,9 +499,15 @@ export default function PanamaMap() {
                 href={loc.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={style}
-                onMouseEnter={() => showTooltip(loc.id, pos.x, pos.y)}
-                onMouseLeave={hideTooltip}
+                style={baseStyle}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
+                  showTooltip(loc.id, pos.x, pos.y);
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                  hideTooltip();
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
@@ -545,9 +517,15 @@ export default function PanamaMap() {
           return (
             <div
               key={loc.id}
-              style={{ ...style, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
-              onMouseEnter={() => showTooltip(loc.id, pos.x, pos.y)}
-              onMouseLeave={hideTooltip}
+              style={{ ...baseStyle, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
+                showTooltip(loc.id, pos.x, pos.y);
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                hideTooltip();
+              }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />

@@ -47,8 +47,8 @@ export default function HomePage() {
 
       <ServiceTimes />
 
-      <section className="py-10 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-10 bg-white">
+        <div className="w-full px-4">
           <div className="text-center mb-10">
             <p className="eyebrow">Nuestras iglesias</p>
             <h2 className="font-display text-3xl md:text-4xl font-semibold text-navy-900">
@@ -59,7 +59,7 @@ export default function HomePage() {
               Toca el marcador <strong className="text-primary-500">M</strong> para abrir la ubicación en Google Maps.
             </p>
           </div>
-          <div className="rounded-2xl overflow-hidden p-2 bg-stone-50" style={{ border: "1px solid rgba(8,15,46,0.07)" }}>
+          <div className="rounded-2xl overflow-hidden p-0 bg-stone-50" style={{ border: "1px solid rgba(8,15,46,0.07)", minHeight: "420px" }}>
             <PanamaMap />
           </div>
           <p className="text-center text-navy-900/40 text-xs font-sans mt-4">
