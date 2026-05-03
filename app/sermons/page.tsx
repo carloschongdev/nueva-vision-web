@@ -9,21 +9,21 @@ export const metadata: Metadata = {
 };
 
 const featured = {
-  title: "Tú Lo Vas a Alcanzar",
-  speaker: "Pastor Juan Carlos Harrigan",
+  title: "El Poder de la Fe",
+  speaker: "Predicas Cristianas",
   date: "2024",
   series: "Predicaciones",
-  videoId: "SzwtR7eKTKA",
-  description: "Un mensaje poderoso del Pastor Juan Carlos Harrigan para fortalecer tu fe y creer en las promesas de Dios.",
+  videoId: "YkgkThdzX-8",
+  description: "Un mensaje poderoso sobre el poder de la fe para fortalecer tu vida espiritual y creer en las promesas de Dios.",
 };
 
 const sermons = [
-  { title: "No Sigas Escogiendo Mal", speaker: "Juan Pablo Lerman",              date: "2024", series: "Predicaciones", videoId: "TtVxbPM3CtQ", duration: "" },
-  { title: "Ordena Tu Casa",          speaker: "Pastor Ernesto Cuevas",          date: "2025", series: "Predicaciones", videoId: "uU7xkRo602c", duration: "" },
-  { title: "Yahweh Se Manifestará",   speaker: "Oasis Ministry",                 date: "2021", series: "Alabanza",       videoId: "Qem0WSJXLCE", duration: "" },
-  { title: "Háblame De Cerca",        speaker: "Grupo Grace & Kairo Worship",    date: "2026", series: "Alabanza",       videoId: "0pwd1dFwWDI", duration: "" },
-  { title: "Dios Te Levantará",       speaker: "Juan Pablo Lerman",              date: "2025", series: "Predicaciones", videoId: "DbHMisO7AGg", duration: "" },
-  { title: "Barro",                   speaker: "Kairo Worship ft. Joe L Barnes", date: "2024", series: "Alabanza",       videoId: "VGKSLzCJWoY", duration: "" },
+  { title: "El Poder de la Fe",          speaker: "Predicas Cristianas",    date: "2024", series: "Predicaciones", videoId: "YkgkThdzX-8",  duration: "" },
+  { title: "Mensaje de Vida",            speaker: "Predicas Cristianas",    date: "2024", series: "Predicaciones", videoId: "vYTDCe7n67k",  duration: "" },
+  { title: "Palabra que Transforma",     speaker: "Predicas Cristianas",    date: "2024", series: "Predicaciones", videoId: "vkInpwCNwwU",  duration: "" },
+  { title: "Fe que Mueve Montañas",      speaker: "Predicas Cristianas",    date: "2025", series: "Predicaciones", videoId: "1A4KMnPYgaE",  duration: "" },
+  { title: "Dios Tiene un Plan para Ti", speaker: "Predicas Cristianas",    date: "2025", series: "Predicaciones", videoId: "MVPe-cjBIqg",  duration: "" },
+  { title: "Confía en el Señor",         speaker: "Predicas Cristianas",    date: "2025", series: "Predicaciones", videoId: "Vr8HLGBXNvs",  duration: "" },
 ];
 
 export default function SermonsPage() {
