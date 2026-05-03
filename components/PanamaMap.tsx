@@ -242,7 +242,7 @@ export default function PanamaMap() {
         const bounds = pathGen.bounds(d as any);
         const [[x0, y0], [x1, y1]] = bounds;
         if ([x0, y0, x1, y1].some(isNaN)) return;
-        const padding = 40;
+        const padding = -20;
         const newViewBox = `${x0 - padding} ${y0 - padding} ${x1 - x0 + padding * 2} ${y1 - y0 + padding * 2}`;
 
         d3.select(svgEl)
