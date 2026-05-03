@@ -8,8 +8,6 @@ import { type Location, initialLocations } from "@/lib/churches";
 const isDev = process.env.NODE_ENV === "development";
 
 // ─── Simplemaps projection ────────────────────────────────────────────────────
-// Calibration points from countrymap.js `proj_coordinates`.
-// SVG viewBox is 0 0 1000 421.
 const PROJ_REFS = [
   { px: 90.9,  py: 382.5, lat: 7.324609,  lng: -82.75542  },
   { px: 545.5, py: 229.8, lat: 8.30261,   lng: -79.817431 },
@@ -76,8 +74,36 @@ const WazeIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type EditForm = { name: string; active: boolean; lat: string; lng: string; mapsUrl: string };
+type Cluster = { ids: string[]; x: number; y: number };
 
+function buildClusters(positions: Record<string, { x: number; y: number }>): Cluster[] {
+  const CLUSTER_RADIUS = 35;
+  const visited = new Set<string>();
+  const clusters: Cluster[] = [];
+
+  for (const id of Object.keys(positions)) {
+    if (visited.has(id)) continue;
+    const pos = positions[id];
+    const nearby = Object.keys(positions).filter((otherId) => {
+      if (otherId === id) return false;
+      const o = positions[otherId];
+      return Math.hypot(o.x - pos.x, o.y - pos.y) < CLUSTER_RADIUS;
+    });
+    if (nearby.length >= 2) {
+      const group = [id, ...nearby];
+      group.forEach((g) => visited.add(g));
+      const avgX = group.reduce((s, g) => s + positions[g].x, 0) / group.length;
+      const avgY = group.reduce((s, g) => s + positions[g].y, 0) / group.length;
+      clusters.push({ ids: group, x: avgX, y: avgY });
+    } else {
+      visited.add(id);
+      clusters.push({ ids: [id], x: pos.x, y: pos.y });
+    }
+  }
+  return clusters;
+}
+
+type EditForm = { name: string; active: boolean; lat: string; lng: string; mapsUrl: string };
 
 export default function PanamaMap() {
   const svgRef       = useRef<SVGSVGElement>(null);
@@ -86,7 +112,9 @@ export default function PanamaMap() {
 
   const [editMode,  setEditMode]  = useState(false);
   const [locations, setLocations] = useState<Location[]>(initialLocations);
-  const [tooltip,   setTooltip]   = useState<{ id: string; x: number; y: number } | null>(null);
+
+  // Single-pin tooltip
+  const [tooltip, setTooltip] = useState<{ id: string; x: number; y: number } | null>(null);
   const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showTooltip = useCallback((id: string, x: number, y: number) => {
@@ -102,11 +130,15 @@ export default function PanamaMap() {
     if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
   }, []);
 
-  // Container-relative pixel positions for each pin, recalculated on layout changes
+  // Cluster state
+  const [expandedCluster, setExpandedCluster] = useState<string[] | null>(null);
+  const [clusterTooltip, setClusterTooltip] = useState<{ ids: string[]; x: number; y: number } | null>(null);
+
+  // Container-relative pixel positions
   const [pinPositions, setPinPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [pinScale, setPinScale] = useState(1);
 
-  // pendingPin stores SVG viewBox coordinates (not container pixels)
+  // pendingPin stores SVG viewBox coordinates
   const [pendingPin,  setPendingPin]  = useState<{ svgX: number; svgY: number; lat: number; lng: number } | null>(null);
   const [newPinForm,  setNewPinForm]  = useState({ name: "", active: true });
 
@@ -127,7 +159,7 @@ export default function PanamaMap() {
     fetch("/panama.json").then((r) => r.json()).then(setGeojson);
   }, []);
 
-  // SVG viewBox coords → container-relative pixel (accounts for letterboxing via getScreenCTM)
+  // SVG viewBox coords → container-relative pixel
   const getScreenPos = useCallback((svgX: number, svgY: number): { x: number; y: number } => {
     const svg = svgRef.current;
     if (!svg || !containerRef.current) return { x: 0, y: 0 };
@@ -152,7 +184,7 @@ export default function PanamaMap() {
     return { x: svgPt.x, y: svgPt.y };
   }, []);
 
-  // Recalculates container-relative pin positions after the next paint so getScreenCTM is fresh
+  // Recalculates container-relative pin positions after the next paint
   const recalcPinPositions = useCallback(() => {
     requestAnimationFrame(() => {
       if (!svgRef.current || !containerRef.current) return;
@@ -175,19 +207,16 @@ export default function PanamaMap() {
           y: screenPt.y - rect.top,
         };
       });
-
       setPinPositions(newPositions);
     });
   }, [locations]);
 
-  // Window resize listener (handles orientation changes and browser zoom)
   useEffect(() => {
     if (!geojson) return;
     window.addEventListener("resize", recalcPinPositions);
     return () => window.removeEventListener("resize", recalcPinPositions);
   }, [geojson, recalcPinPositions]);
 
-  // ResizeObserver on the container (handles flex/grid layout shifts that window resize misses)
   useEffect(() => {
     if (!containerRef.current) return;
     const ro = new ResizeObserver(() => recalcPinPositions());
@@ -195,8 +224,7 @@ export default function PanamaMap() {
     return () => ro.disconnect();
   }, [geojson, locations, recalcPinPositions]);
 
-  // Main D3 effect: draws provinces + SVG decorations (pulse rings, edit overlays).
-  // In view mode, pin images are rendered as HTML overlays instead of SVG <image> elements.
+  // Main D3 effect
   useEffect(() => {
     if (!geojson || !svgRef.current) return;
 
@@ -240,86 +268,61 @@ export default function PanamaMap() {
       .attr("pointer-events", "none")
       .text((d: any) => d.properties.name ?? "");
 
-    // ── Pending-pin marker (edit mode "+" dot) ──
+    // ── Pending-pin marker ──
     if (pendingPin) {
       svg.append("circle")
-        .attr("cx", pendingPin.svgX)
-        .attr("cy", pendingPin.svgY)
-        .attr("r", 10)
-        .attr("fill", "#f59e0b")
-        .attr("stroke", "#ffffff")
-        .attr("stroke-width", 2)
+        .attr("cx", pendingPin.svgX).attr("cy", pendingPin.svgY)
+        .attr("r", 10).attr("fill", "#f59e0b")
+        .attr("stroke", "#ffffff").attr("stroke-width", 2)
         .attr("pointer-events", "none");
       svg.append("text")
-        .attr("x", pendingPin.svgX)
-        .attr("y", pendingPin.svgY + 5)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "14")
-        .attr("fill", "white")
-        .attr("font-weight", "bold")
-        .attr("pointer-events", "none")
-        .text("+");
+        .attr("x", pendingPin.svgX).attr("y", pendingPin.svgY + 5)
+        .attr("text-anchor", "middle").attr("font-size", "14")
+        .attr("fill", "white").attr("font-weight", "bold")
+        .attr("pointer-events", "none").text("+");
     }
 
     // ── Per-pin SVG decorations ──
     locations.forEach((loc) => {
       const [svgX, svgY] = projectLatLng(loc.coords[1], loc.coords[0]);
 
-      // Highlight ring around selected pin (edit mode)
       if (editMode && editingPinId === loc.id) {
         svg.append("circle")
-          .attr("cx", svgX)
-          .attr("cy", svgY - 20)
-          .attr("r", 20)
-          .attr("fill", "none")
-          .attr("stroke", "#f59e0b")
-          .attr("stroke-width", 1.5)
-          .attr("stroke-dasharray", "4 2")
+          .attr("cx", svgX).attr("cy", svgY - 20).attr("r", 20)
+          .attr("fill", "none").attr("stroke", "#f59e0b")
+          .attr("stroke-width", 1.5).attr("stroke-dasharray", "4 2")
           .attr("pointer-events", "none");
       }
 
-      // Pulse ring for active locations (view mode only, via SVG SMIL animation)
       if (loc.active && !editMode) {
         const pulse = svg.append("circle")
-          .attr("cx", svgX)
-          .attr("cy", svgY - 5)
-          .attr("r", 8)
-          .attr("fill", "#6b278a")
-          .attr("opacity", 0.2)
-          .attr("pointer-events", "none");
+          .attr("cx", svgX).attr("cy", svgY - 5)
+          .attr("r", 8).attr("fill", "#6b278a")
+          .attr("opacity", 0.2).attr("pointer-events", "none");
         pulse.append("animate")
-          .attr("attributeName", "r")
-          .attr("from", "8").attr("to", "20")
+          .attr("attributeName", "r").attr("from", "8").attr("to", "20")
           .attr("dur", "1.5s").attr("repeatCount", "indefinite");
         pulse.append("animate")
-          .attr("attributeName", "opacity")
-          .attr("from", "0.2").attr("to", "0")
+          .attr("attributeName", "opacity").attr("from", "0.2").attr("to", "0")
           .attr("dur", "1.5s").attr("repeatCount", "indefinite");
       }
 
-      // Pin image — only rendered in edit mode; view mode uses HTML <a> overlay
       if (editMode) {
         const pinEl = svg.append("image")
           .attr("href", "/mercy.svg")
-          .attr("x", svgX - 15)
-          .attr("y", svgY - 40)
-          .attr("width", 30)
-          .attr("height", 40)
+          .attr("x", svgX - 15).attr("y", svgY - 40)
+          .attr("width", 30).attr("height", 40)
           .attr("opacity", loc.active ? 1 : 0.35)
           .style("filter", loc.active ? "none" : "grayscale(100%)")
-          .style("cursor", "grab")
-          .style("pointer-events", "all");
+          .style("cursor", "grab").style("pointer-events", "all");
 
         let dragMoved = false;
-
         const drag = d3.drag()
           .on("start", () => { dragMoved = false; })
           .on("drag", function(event: any) {
             dragMoved = true;
             const c = screenToSvg(event.sourceEvent.clientX, event.sourceEvent.clientY);
-            d3.select(this as SVGImageElement)
-              .attr("x", c.x - 15)
-              .attr("y", c.y - 40);
+            d3.select(this as SVGImageElement).attr("x", c.x - 15).attr("y", c.y - 40);
             if (editingPinIdRef.current === loc.id) {
               const [lat, lng] = pixelToLatLng(c.x, c.y);
               setEditPinForm((f) => ({
@@ -350,7 +353,6 @@ export default function PanamaMap() {
               setPendingPin(null);
             }
           });
-
         pinEl.call(drag as any);
       }
     });
@@ -358,9 +360,11 @@ export default function PanamaMap() {
     recalcPinPositions();
   }, [geojson, locations, editMode, editingPinId, pendingPin, getScreenPos, screenToSvg, recalcPinPositions]);
 
-  // SVG click: add new pin at clicked position (edit mode only, skips existing pins)
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!editMode) return;
+    if (!editMode) {
+      setExpandedCluster(null);
+      return;
+    }
     if ((e.target as SVGElement).tagName === "image") return;
     const c = screenToSvg(e.clientX, e.clientY);
     const [lat, lng] = pixelToLatLng(c.x, c.y);
@@ -429,13 +433,15 @@ export default function PanamaMap() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Popup positions — derived via getScreenPos (getScreenCTM-based, always accurate)
   const editingLoc      = editingPinId ? locations.find((l) => l.id === editingPinId) : null;
   const editPopupPos    = editingLoc
     ? getScreenPos(...projectLatLng(editingLoc.coords[1], editingLoc.coords[0]))
     : null;
   const pendingPopupPos = pendingPin ? getScreenPos(pendingPin.svgX, pendingPin.svgY) : null;
   const cw = containerRef.current?.clientWidth ?? SVG_W;
+
+  // Compute clusters from current pin positions (only in view mode)
+  const clusters = !editMode ? buildClusters(pinPositions) : [];
 
   return (
     <div className="relative w-full">
@@ -446,6 +452,7 @@ export default function PanamaMap() {
               setEditMode((m) => !m);
               setPendingPin(null); setEditingPinId(null);
               setShowExport(false); setTooltip(null);
+              setExpandedCluster(null); setClusterTooltip(null);
             }}
             className={`text-xs font-sans font-semibold px-3 py-1.5 rounded-full border transition-colors ${
               editMode
@@ -463,7 +470,7 @@ export default function PanamaMap() {
         className="relative w-full rounded-xl overflow-hidden"
         style={{ aspectRatio: "1000/500", height: "auto" }}
       >
-        {/* SVG: provinces, province labels, pulse rings, edit overlays */}
+        {/* SVG: provinces, labels, pulse rings, edit overlays */}
         <svg
           ref={svgRef}
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
@@ -474,67 +481,119 @@ export default function PanamaMap() {
           className={editMode ? "cursor-crosshair" : ""}
         />
 
-        {/* View-mode pin overlays — real HTML <a> links, positioned via getScreenCTM */}
+        {/* View-mode: clustered pins */}
         {!editMode && (() => {
-          const pinW = Math.max(14, Math.round(22 * pinScale));
-          const pinH = Math.max(19, Math.round(30 * pinScale));
-          return locations.map((loc) => {
-          const pos = pinPositions[loc.id];
-          if (!pos) return null;
-          const baseStyle: React.CSSProperties = {
-            position: "absolute",
-            left: pos.x - pinW / 2,
-            top: pos.y - pinH,
-            width: pinW,
-            height: pinH,
-            zIndex: 10,
-            display: "block",
-            transition: "transform 0.15s ease",
-            transformOrigin: "bottom center",
-          };
-          if (loc.active) {
+          const pinW = Math.max(12, Math.round(18 * pinScale));
+          const pinH = Math.max(16, Math.round(24 * pinScale));
+
+          return clusters.map((cluster) => {
+            if (cluster.ids.length === 1) {
+              // ── Single pin ──
+              const loc = locations.find((l) => l.id === cluster.ids[0]);
+              if (!loc) return null;
+              const baseStyle: React.CSSProperties = {
+                position: "absolute",
+                left: cluster.x - pinW / 2,
+                top: cluster.y - pinH,
+                width: pinW,
+                height: pinH,
+                zIndex: 10,
+                display: "block",
+                transition: "transform 0.15s ease",
+                transformOrigin: "bottom center",
+              };
+              if (loc.active) {
+                return (
+                  <a
+                    key={loc.id}
+                    href={loc.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={baseStyle}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
+                      showTooltip(loc.id, cluster.x, cluster.y);
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                      hideTooltip();
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
+                  </a>
+                );
+              }
+              return (
+                <div
+                  key={loc.id}
+                  style={{ ...baseStyle, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
+                    showTooltip(loc.id, cluster.x, cluster.y);
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                    hideTooltip();
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
+                </div>
+              );
+            }
+
+            // ── Multi-pin cluster badge ──
+            const isOpen =
+              expandedCluster !== null &&
+              expandedCluster.length === cluster.ids.length &&
+              cluster.ids.every((id) => expandedCluster.includes(id));
+            const clusterKey = cluster.ids.slice().sort().join(",");
+
             return (
-              <a
-                key={loc.id}
-                href={loc.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={baseStyle}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
-                  showTooltip(loc.id, pos.x, pos.y);
+              <div
+                key={clusterKey}
+                style={{
+                  position: "absolute",
+                  left: cluster.x - 18,
+                  top: cluster.y - 18,
+                  width: 36,
+                  height: 36,
+                  zIndex: 15,
+                  cursor: "pointer",
                 }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-                  hideTooltip();
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedCluster(isOpen ? null : cluster.ids);
+                  setTooltip(null);
+                  setClusterTooltip(null);
                 }}
+                onMouseEnter={() => setClusterTooltip({ ids: cluster.ids, x: cluster.x, y: cluster.y })}
+                onMouseLeave={() => setClusterTooltip(null)}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
-              </a>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: isOpen ? "#5a1f76" : "#6b278a",
+                  border: "2px solid white",
+                  boxShadow: "0 2px 8px rgba(107,39,138,0.45)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                  fontSize: 13,
+                  transition: "background 0.15s ease",
+                }}>
+                  {cluster.ids.length}
+                </div>
+              </div>
             );
-          }
-          return (
-            <div
-              key={loc.id}
-              style={{ ...baseStyle, opacity: 0.35, filter: "grayscale(100%)", cursor: "default" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = "scale(1.4)";
-                showTooltip(loc.id, pos.x, pos.y);
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-                hideTooltip();
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/mercy.svg" alt={loc.name} style={{ width: "100%", height: "100%" }} />
-            </div>
-          );
-        });
+          });
         })()}
 
-        {/* Add-pin popup — HTML overlay, positioned via getScreenPos */}
+        {/* Add-pin popup */}
         {pendingPin && pendingPopupPos && (
           <div
             className="absolute z-40 bg-white rounded-xl shadow-xl p-4 w-52"
@@ -575,7 +634,7 @@ export default function PanamaMap() {
           </div>
         )}
 
-        {/* Edit-pin popup — HTML overlay, positioned via getScreenPos */}
+        {/* Edit-pin popup */}
         {editingPinId && editingLoc && editPopupPos && (
           <div
             className="absolute z-40 bg-white rounded-xl shadow-xl p-4 w-56"
@@ -634,7 +693,7 @@ export default function PanamaMap() {
           </div>
         )}
 
-        {/* View-mode tooltip — pointer-events enabled so Maps/Waze links are clickable */}
+        {/* Single-pin tooltip */}
         {!editMode && tooltip && (() => {
           const loc = locations.find((l) => l.id === tooltip.id);
           if (!loc) return null;
@@ -672,6 +731,90 @@ export default function PanamaMap() {
                     </a>
                   </div>
                 )}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Cluster hover tooltip */}
+        {!editMode && clusterTooltip && !expandedCluster && (
+          <div
+            className="absolute z-20 pointer-events-none"
+            style={{ left: clusterTooltip.x - 70, top: clusterTooltip.y - 52 }}
+          >
+            <div className="bg-navy-900 text-white rounded-lg px-3 py-1.5 text-center shadow-lg">
+              <p className="font-sans text-xs font-medium whitespace-nowrap">
+                {clusterTooltip.ids.length} iglesias en esta zona
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Expanded cluster panel */}
+        {!editMode && expandedCluster && (() => {
+          const validPos = expandedCluster.map((id) => pinPositions[id]).filter(Boolean);
+          if (validPos.length === 0) return null;
+          const cx = validPos.reduce((s, p) => s + p.x, 0) / validPos.length;
+          const cy = validPos.reduce((s, p) => s + p.y, 0) / validPos.length;
+          return (
+            <div
+              className="absolute z-30 bg-white rounded-xl shadow-xl p-3 w-56"
+              style={{
+                left: Math.min(cx + 26, cw - 240),
+                top: Math.max(cy - 90, 8),
+                border: "1px solid rgba(8,15,46,0.10)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-sans font-bold text-xs text-navy-900">
+                  {expandedCluster.length} iglesias
+                </p>
+                <button
+                  onClick={() => setExpandedCluster(null)}
+                  className="text-navy-900/40 hover:text-navy-900 text-xs leading-none transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="space-y-0">
+                {expandedCluster.map((id, i) => {
+                  const loc = locations.find((l) => l.id === id);
+                  if (!loc) return null;
+                  const wazeUrl = `https://waze.com/ul?ll=${loc.coords[1]},${loc.coords[0]}&navigate=yes`;
+                  const shortName = loc.name.replace("Iglesia Nueva Visión La Misericordia ", "");
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center justify-between gap-2 py-1.5"
+                      style={i < expandedCluster.length - 1 ? { borderBottom: "1px solid rgba(8,15,46,0.06)" } : {}}
+                    >
+                      <span className="font-sans text-[11px] text-navy-900 truncate flex-1 leading-tight">
+                        {shortName}
+                      </span>
+                      <div className="flex gap-1 shrink-0">
+                        <a
+                          href={loc.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 transition-colors leading-none"
+                          title="Google Maps"
+                        >
+                          📍
+                        </a>
+                        <a
+                          href={wazeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 transition-colors flex items-center"
+                          title="Waze"
+                        >
+                          <WazeIcon className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
@@ -721,6 +864,12 @@ export default function PanamaMap() {
         <div className="flex items-center gap-2">
           <Image src="/mercy.svg" alt="pronto" width={20} height={20} className="opacity-40 grayscale object-contain" />
           <span className="font-sans text-xs text-navy-900/60">Próximamente</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#6b278a", border: "1.5px solid #9461a9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: "white", fontSize: 9, fontWeight: "bold" }}>N</span>
+          </div>
+          <span className="font-sans text-xs text-navy-900/60">Grupo de iglesias</span>
         </div>
       </div>
     </div>
