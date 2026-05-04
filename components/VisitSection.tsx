@@ -6,8 +6,8 @@ import Image from "next/image";
 
 const steps = [
   { num: "01", title: "Eres bienvenido",   desc: "Nuestro equipo te recibirá y responderá tus preguntas desde el inicio." },
-  { num: "02", title: "Vive el culto",     desc: "Música de adoración, un mensaje bíblico relevante y un ambiente cálido." },
-  { num: "03", title: "Conéctate",         desc: "Quédate después, toma un café y conoce a nuestra familia." },
+  { num: "02", title: "Vive el culto",     desc: "Oración, adoración, y Palabra de Dios." },
+  { num: "03", title: "Conéctate",         desc: "Quédate después y conoce a nuestra familia." },
 ];
 
 export default function VisitSection() {
