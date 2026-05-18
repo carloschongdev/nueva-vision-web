@@ -43,6 +43,7 @@ export default async function DashboardPage() {
   const progresoMap = Object.fromEntries(progresoData.map(p => [p.cursoId, p]))
 
   const isAdmin = profile?.rol === 'admin'
+  const nombre = profile?.nombre || user?.email?.split('@')[0] || 'Estudiante'
 
   return (
     <div className="min-h-screen bg-stone-50 pt-24 pb-16">
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
           <div>
             <p className="eyebrow">Panel del Estudiante</p>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-primary-900">
-              Bienvenido, {profile?.nombre} {profile?.apellido}
+              Bienvenido/a, {nombre}
             </h1>
           </div>
           <div className="flex gap-3">
