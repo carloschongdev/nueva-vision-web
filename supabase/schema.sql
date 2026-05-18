@@ -165,10 +165,21 @@ create policy "Admins pueden ver todos los certificados"
     exists (select 1 from public.profiles where id = auth.uid() and rol = 'admin')
   );
 
-create policy "Admins pueden ver todos los perfiles"
-  on public.profiles for all using (
-    exists (select 1 from public.profiles where id = auth.uid() and rol = 'admin')
+-- Función SECURITY DEFINER para evitar recursión infinita en RLS
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+stable
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and rol = 'admin'
   );
+$$;
+
+create policy "Admins pueden ver todos los perfiles"
+  on public.profiles for all using (public.is_admin());
 
 -- Trigger para crear profile al registrarse
 create or replace function public.handle_new_user()
