@@ -10,6 +10,7 @@ const links = [
   { label: "Inicio",        href: "/" },
   { label: "Nosotros",      href: "/about" },
   { label: "Predicaciones", href: "/sermons" },
+  { label: "Instituto",     href: "/instituto" },
   { label: "Contacto",      href: "/contact" },
 ];
 
